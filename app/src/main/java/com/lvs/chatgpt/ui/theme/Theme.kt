@@ -1,4 +1,4 @@
-package com.lvs.chatgpt.presentation.ui.theme
+package com.lvs.chatgpt.ui.theme
 
 import android.app.Activity
 import android.os.Build

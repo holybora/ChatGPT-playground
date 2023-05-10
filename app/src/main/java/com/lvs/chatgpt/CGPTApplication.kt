@@ -1,4 +1,4 @@
-package com.lvs.chatgpt.presentation
+package com.lvs.chatgpt
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

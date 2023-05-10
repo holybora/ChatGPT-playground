@@ -1,4 +1,4 @@
-package com.lvs.chatgpt.presentation.ui.theme
+package com.lvs.chatgpt.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

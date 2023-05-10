@@ -1,7 +1,8 @@
-package com.lvs.chatgpt.presentation.di
+package com.lvs.chatgpt.di
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.lvs.chatgpt.BuildConfig
 import com.lvs.data.remote.api.OpenAIApi
 import dagger.Module
 import dagger.Provides
@@ -19,7 +20,7 @@ object NetworkModule {
 
     //TODO: move const to configuration bundle
     private const val DEFAULT_OPENAI_API = "https://api.openai.com/"
-    private const val OPEN_AI_API_KEY = "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"
+
 
     @Singleton
     @Provides
@@ -37,7 +38,7 @@ object NetworkModule {
                 val original = chain.request()
                 // Request customization: add request headers
                 val requestBuilder = original.newBuilder()
-                    .addHeader("Authorization", "Bearer $OPEN_AI_API_KEY")
+                    .addHeader("Authorization", "Bearer ${BuildConfig.APP_KEY}")
                 chain.proceed(requestBuilder.build())
             })
         .build()

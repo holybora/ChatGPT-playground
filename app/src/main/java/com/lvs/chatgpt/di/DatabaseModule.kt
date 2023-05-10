@@ -1,4 +1,4 @@
-package com.lvs.chatgpt.presentation.di
+package com.lvs.chatgpt.di
 
 import android.app.Application
 import androidx.room.Room
