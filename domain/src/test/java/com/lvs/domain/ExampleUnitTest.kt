@@ -1,4 +1,4 @@
-package com.example.domain
+package com.lvs.domain
 
 import org.junit.Test
 

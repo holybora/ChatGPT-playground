@@ -45,9 +45,9 @@ class SimpleEntityReadWriteTest {
     fun writeMessageAndCheckProperties() = runTest {
         val conversationId = 1L
         val textMessage = "message #1"
-        val isBot = false
+        val role = "system"
 
-        val messageId = messagesDao.insert(MessageEntity.InsertionPrototype(conversationId, textMessage, isBot))
+        val messageId = messagesDao.insert(MessageEntity.InsertionPrototype(conversationId, textMessage, role))
 
         val messages = messagesDao.getAllByConversationId(conversationId).firstOrNull()
 
@@ -58,13 +58,13 @@ class SimpleEntityReadWriteTest {
         val messageInTable = messages?.first()
 
         assert(messageInTable?.uid == messageId) {
-            "Message id unexpected. Should be $messageId but list is: ${messageInTable?.uid}"
+            "Message id unexpected. Should be $messageId but was: ${messageInTable?.uid}"
         }
         assert(messageInTable?.text == textMessage) {
-            "Message text unexpected. Should be $textMessage but list is: ${messageInTable?.text}"
+            "Message text unexpected. Should be $textMessage but was: ${messageInTable?.text}"
         }
-        assert(messageInTable?.isBot == isBot) {
-            "Message isBot unexpected. Should be $isBot but list is: ${messageInTable?.isBot}"
+        assert(messageInTable?.role == role) {
+            "Message role unexpected. Should be $role but was: ${messageInTable?.role}"
         }
 
     }

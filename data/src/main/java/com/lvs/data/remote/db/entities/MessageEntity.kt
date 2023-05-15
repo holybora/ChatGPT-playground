@@ -11,7 +11,7 @@ data class MessageEntity(
     @ColumnInfo(name = "conversation_id")
     val conversationId: Long,
     val text: String,
-    val isBot: Boolean,
+    val role: String,
     @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
     val createdAt: String
 ) {
@@ -19,7 +19,7 @@ data class MessageEntity(
         @ColumnInfo(name = "conversation_id")
         val conversationId: Long,
         val text: String,
-        val isBot: Boolean
+        val role: String
     )
 
 }

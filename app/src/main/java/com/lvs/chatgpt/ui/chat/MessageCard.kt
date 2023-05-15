@@ -24,12 +24,14 @@ import com.lvs.chatgpt.ui.theme.BackGroundMessageHuman
 import com.lvs.chatgpt.ui.theme.ChatGPTTheme
 import com.lvs.chatgpt.ui.theme.ColorTextGPT
 import com.lvs.chatgpt.ui.theme.ColorTextHuman
+import com.lvs.data.remote.common.GPTRole
 import com.lvs.data.remote.db.entities.MessageEntity
 
 @Composable
 fun MessageCard(message: MessageEntity, isLast: Boolean = false) {
+    val isBot = message.role == GPTRole.USER.value
     Column(
-        horizontalAlignment = if (!message.isBot) Alignment.End else Alignment.Start,
+        horizontalAlignment = if (isBot) Alignment.End else Alignment.Start,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
@@ -39,11 +41,11 @@ fun MessageCard(message: MessageEntity, isLast: Boolean = false) {
             modifier = Modifier
                 .widthIn(0.dp, 260.dp) //mention max width here
                 .background(
-                    if (!message.isBot) BackGroundMessageHuman else BackGroundMessageGPT,
+                    if (!isBot) BackGroundMessageHuman else BackGroundMessageGPT,
                     shape = RoundedCornerShape(12.dp)
                 ),
         ) {
-            if (!message.isBot) {
+            if (!isBot) {
                 HumanMessageCard(message = message)
             } else {
                 BotMessageCard(message = message)

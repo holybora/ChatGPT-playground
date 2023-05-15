@@ -1,8 +1,9 @@
 package com.lvs.data.remote.repositories
 
-import com.lvs.data.remote.models.TextCompletionsParam
-import kotlinx.coroutines.flow.Flow
+import com.lvs.data.remote.api.enities.ChatCompletionResponseBody
+import com.lvs.data.remote.api.enities.MessageDto
+import com.lvs.data.remote.common.GPTModel
 
 interface OpenAIRepository {
-    fun textCompletionsWithStream(params: TextCompletionsParam): Flow<String>
+    suspend fun textCompletionsWithStream(model: GPTModel, messages: List<MessageDto>): ChatCompletionResponseBody
 }

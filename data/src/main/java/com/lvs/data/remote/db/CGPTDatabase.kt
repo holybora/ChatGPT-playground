@@ -12,7 +12,7 @@ import com.lvs.data.remote.db.entities.MessageEntity
 
 @Database(
     entities = [MessageEntity::class, ConversationEntity::class],
-    version = 2
+    version = 3
 )
 @TypeConverters(Converters::class)
 abstract class CGPTDatabase : RoomDatabase() {

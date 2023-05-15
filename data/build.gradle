@@ -39,12 +39,14 @@ dependencies {
     def retrofit = '2.9.0'
     api "com.squareup.retrofit2:retrofit:$retrofit"
     api "com.squareup.retrofit2:converter-gson:$retrofit"
+    def okhttp = '4.10.0'
+    api "com.squareup.okhttp3:logging-interceptor:$okhttp"
 
     def coroutines = '1.7.0'
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines"
 
 
-    def hilt = '2.44'
+    def hilt = '2.45'
     kapt  "com.google.dagger:hilt-compiler:$hilt"
     implementation  "com.google.dagger:hilt-android:$hilt"
 

@@ -10,8 +10,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.text.DateFormat
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -27,12 +31,13 @@ object NetworkModule {
     fun provideGson(): Gson {
         return GsonBuilder()
             .setLenient()
+            .setDateFormat(DateFormat.LONG)
             .create()
     }
 
     @Singleton
     @Provides
-    fun provideOkHttpClient() = OkHttpClient.Builder()
+    fun provideOkHttpClient(logger: HttpLoggingInterceptor) = OkHttpClient.Builder()
         .addNetworkInterceptor(
             Interceptor { chain ->
                 val original = chain.request()
@@ -41,6 +46,11 @@ object NetworkModule {
                     .addHeader("Authorization", "Bearer ${BuildConfig.APP_KEY}")
                 chain.proceed(requestBuilder.build())
             })
+        .addNetworkInterceptor(logger)
+        .callTimeout(Duration.ZERO)
+        .connectTimeout(Duration.ZERO)
+        .readTimeout(Duration.ZERO)
+        .writeTimeout(Duration.ZERO)
         .build()
 
     @Singleton
@@ -61,4 +71,11 @@ object NetworkModule {
     @Singleton
     fun provideOpenAIService(retrofit: Retrofit): OpenAIApi =
         retrofit.create(OpenAIApi::class.java)
+
+
+    @Provides
+    @Singleton
+    fun provideLoggingInterceptor() : HttpLoggingInterceptor = HttpLoggingInterceptor().also {
+        it.setLevel(HttpLoggingInterceptor.Level.BODY)
+    }
 }

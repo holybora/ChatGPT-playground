@@ -1,3 +1,3 @@
-package com.example.domain
+package com.lvs.domain
 
 //This module for UseCases etc.
