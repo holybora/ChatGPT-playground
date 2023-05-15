@@ -31,4 +31,11 @@ android {
 
 dependencies {
     api project(path: ':data')
+
+    def lifecycle_version = "2.6.1"
+
+    // ViewModel
+    api "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    // ViewModel utilities for Compose
+    api "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"
 }

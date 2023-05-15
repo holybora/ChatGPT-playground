@@ -26,26 +26,19 @@ class OpenAIRepositoryImpl @Inject constructor(
     override fun textCompletionsWithStream(params: TextCompletionsParam): Flow<String> =
         callbackFlow {
             withContext(Dispatchers.IO) {
-                val response = (if (params.isTurbo) openAIApi.textCompletionsTurboWithStream(
-                    params.toJson()
-                ) else openAIApi.textCompletionsWithStream(params.toJson())).execute()
+                val response = openAIApi.textCompletionsWithStream(params.toJson()).execute()
 
                 if (response.isSuccessful) {
                     val input = response.body()?.byteStream()?.bufferedReader() ?: throw Exception()
                     try {
                         while (true) {
-                            val line = withContext(Dispatchers.IO) {
-                                input.readLine()
-                            } ?: continue
+                            val line = input.readLine() ?: continue
                             if (line == "data: [DONE]") {
                                 close()
                             } else if (line.startsWith("data:")) {
                                 try {
                                     // Handle & convert data -> emit to client
-                                    val value =
-                                        if (params.isTurbo) lookupDataFromResponseTurbo(line) else lookupDataFromResponse(
-                                            line
-                                        )
+                                    val value = lookupDataFromResponse(line)
 
                                     if (value.isNotEmpty()) {
                                         trySend(value)
@@ -59,10 +52,7 @@ class OpenAIRepositoryImpl @Inject constructor(
                     } catch (e: IOException) {
                         throw Exception(e)
                     } finally {
-                        withContext(Dispatchers.IO) {
-                            input.close()
-                        }
-
+                        input.close()
                         close()
                     }
                 } else {

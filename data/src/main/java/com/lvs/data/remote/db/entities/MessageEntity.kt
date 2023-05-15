@@ -7,18 +7,19 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "messages")
 data class MessageEntity(
     @PrimaryKey(autoGenerate = true)
-    val uid: Int,
+    val uid: Long,
     @ColumnInfo(name = "conversation_id")
-    val conversationId: String,
-    val question: String,
-    val answer: String,
+    val conversationId: Long,
+    val text: String,
+    val isBot: Boolean,
     @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
     val createdAt: String
 ) {
     data class InsertionPrototype(
         @ColumnInfo(name = "conversation_id")
-        val conversationId: String,
-        val question: String,
-        val answer: String,
+        val conversationId: Long,
+        val text: String,
+        val isBot: Boolean
     )
+
 }

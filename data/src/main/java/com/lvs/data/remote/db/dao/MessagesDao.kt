@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 interface MessagesDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE, entity = MessageEntity::class)
-    fun insert(message: MessageEntity.InsertionPrototype)
+    fun insert(message: MessageEntity.InsertionPrototype): Long
 
     @Delete
     fun deleteAll(message: MessageEntity)
@@ -21,8 +21,8 @@ interface MessagesDao {
     @Query("SELECT * FROM messages")
     fun getAll(): Flow<List<MessageEntity>>
 
-    @Query("SELECT * FROM messages WHERE conversation_id == :conversationId ORDER BY created_at DESC")
-    fun getAllByConversationId(conversationId: String): Flow<List<MessageEntity>>
+    @Query("SELECT * FROM messages WHERE conversation_id = :conversationId ORDER BY created_at DESC")
+    fun getAllByConversationId(conversationId: Long): Flow<List<MessageEntity>>
 
 
 }

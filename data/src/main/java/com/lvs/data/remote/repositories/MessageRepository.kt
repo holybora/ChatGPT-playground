@@ -4,7 +4,9 @@ import com.lvs.data.remote.db.entities.MessageEntity
 import kotlinx.coroutines.flow.Flow
 
 interface MessageRepository {
-    fun fetchMessages(conversationId: String): Flow<List<MessageEntity>>
-    fun createMessage(message: MessageEntity.InsertionPrototype)
+
+    fun getAll(): Flow<List<MessageEntity>>
+    fun fetchMessages(conversationId: Long): Flow<List<MessageEntity>>
+    fun createMessage(message: MessageEntity.InsertionPrototype) :Long
     fun deleteMessage(message: MessageEntity)
 }

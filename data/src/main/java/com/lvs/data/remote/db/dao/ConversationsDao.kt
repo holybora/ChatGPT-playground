@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 interface ConversationsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE, entity = ConversationEntity::class)
-    fun insert(conversation: ConversationEntity.InsertionPrototype)
+    fun insert(conversation: ConversationEntity.InsertionPrototype): Long
 
     @Delete
     fun delete(conversation: ConversationEntity)

@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 
 interface ConversationRepository {
-    suspend fun fetchConversations(): Flow<List<ConversationEntity>>
-    fun newConversation(title: String)
+    fun fetchConversations(): Flow<List<ConversationEntity>>
+    fun newConversation(title: String): Long
     fun deleteConversation(conversation: ConversationEntity)
 }

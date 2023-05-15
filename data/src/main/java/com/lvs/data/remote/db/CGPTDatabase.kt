@@ -10,11 +10,14 @@ import com.lvs.data.remote.db.entities.ConversationEntity
 import com.lvs.data.remote.db.entities.MessageEntity
 
 
-@Database(entities = [MessageEntity::class, ConversationEntity::class], version = 1)
+@Database(
+    entities = [MessageEntity::class, ConversationEntity::class],
+    version = 2
+)
 @TypeConverters(Converters::class)
 abstract class CGPTDatabase : RoomDatabase() {
 
-    abstract fun messagesDao(): MessagesDao
-    abstract fun conversationsDao(): ConversationsDao
+    abstract fun getMessagesDao(): MessagesDao
+    abstract fun getConversationsDao(): ConversationsDao
 
 }

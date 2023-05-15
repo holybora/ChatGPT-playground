@@ -8,7 +8,7 @@ class ConversationRepositoryImpl @Inject constructor(
     private val conversationsDao: ConversationsDao,
 ) : ConversationRepository {
 
-    override suspend fun fetchConversations() = conversationsDao.getAllDesc()
+    override fun fetchConversations() = conversationsDao.getAllDesc()
 
     override fun newConversation(title: String) = conversationsDao.insert(ConversationEntity.InsertionPrototype(title))
 

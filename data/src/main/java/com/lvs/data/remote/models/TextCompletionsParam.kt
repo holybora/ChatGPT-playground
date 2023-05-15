@@ -14,13 +14,11 @@ data class TextCompletionsParam(
     @SerializedName("n")
     val n: Int = 1,
     @SerializedName("stream")
-    var stream: Boolean = true,
+    var stream: Boolean = false,
     @SerializedName("maxTokens")
     val maxTokens: Int = 2048,
     @SerializedName("model")
-    val model: GPTModel = GPTModel.gpt35Turbo,
-    @SerializedName("messages")
-    val messagesTurbo: List<MessageTurbo> = emptyList(),
+    val model: GPTModel = GPTModel.davinci,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -35,7 +33,6 @@ data class TextCompletionsParam(
         if (stream != other.stream) return false
         if (maxTokens != other.maxTokens) return false
         if (model != other.model) return false
-        if (messagesTurbo != other.messagesTurbo) return false
 
         return true
     }
@@ -48,12 +45,8 @@ data class TextCompletionsParam(
         result = 31 * result + stream.hashCode()
         result = 31 * result + maxTokens
         result = 31 * result + model.hashCode()
-        result = 31 * result + messagesTurbo.hashCode()
         return result
     }
-
-    val isTurbo: Boolean
-        get() = model == GPTModel.gpt35Turbo
 }
 
 fun TextCompletionsParam.toJson(): JsonObject {
@@ -64,7 +57,6 @@ fun TextCompletionsParam.toJson(): JsonObject {
 
     if (model == GPTModel.gpt35Turbo) {
         val jsonArray = JsonArray()
-        for (message in messagesTurbo) jsonArray.add(message.toJson())
 
         json.add("messages", jsonArray)
     } else {

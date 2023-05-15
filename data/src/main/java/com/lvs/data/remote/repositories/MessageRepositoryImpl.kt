@@ -8,12 +8,13 @@ import javax.inject.Inject
 class MessageRepositoryImpl @Inject constructor(
     private val messagesDao: MessagesDao
 ) : MessageRepository {
+    override fun getAll(): Flow<List<MessageEntity>> = messagesDao.getAll()
 
-    override fun fetchMessages(conversationId: String): Flow<List<MessageEntity>> =
+    override fun fetchMessages(conversationId: Long): Flow<List<MessageEntity>> =
         messagesDao.getAllByConversationId(conversationId)
 
-    override fun createMessage(message: MessageEntity.InsertionPrototype) {
-        messagesDao.insert(message)
+    override fun createMessage(message: MessageEntity.InsertionPrototype): Long {
+        return messagesDao.insert(message)
     }
 
     override fun deleteMessage(message: MessageEntity) =
