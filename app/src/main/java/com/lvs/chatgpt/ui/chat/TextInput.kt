@@ -2,12 +2,15 @@ package com.lvs.chatgpt.ui.chat
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,10 +56,16 @@ fun TextInput(
                             unfocusedBorderColor = Color.Transparent,
                             focusedLabelColor = Color.White,
                         ),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+                        keyboardActions = KeyboardActions(onSend = {
+                            val textClone = text.text
+                            text = TextFieldValue("")
+                            onSendMessageListener(textClone)
+                        })
                     )
                     IconButton(onClick = {
                         scope.launch {
-                            val textClone = text.text.toString()
+                            val textClone = text.text
                             text = TextFieldValue("")
                             onSendMessageListener(textClone)
                         }

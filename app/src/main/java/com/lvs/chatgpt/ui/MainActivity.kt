@@ -1,7 +1,6 @@
 package com.lvs.chatgpt.ui
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -30,6 +29,7 @@ import com.lvs.chatgpt.ui.components.AppBar
 import com.lvs.chatgpt.ui.components.AppScaffold
 import com.lvs.chatgpt.ui.theme.ChatGPTTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,11 +45,7 @@ class MainActivity : ComponentActivity() {
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
             val drawerOpen by viewModel.drawerShouldBeOpened.collectAsStateWithLifecycle()
 
-            val conversationsState by
-                viewModel.conversationsFlow.collectAsStateWithLifecycle(initialValue = emptyList())
-            val selectedConversation by
-                viewModel.selectedConversation.collectAsStateWithLifecycle(initialValue = MainUiState.DEFAULT_CONVERSATION_ID)
-            val messages by viewModel.messages.collectAsStateWithLifecycle(initialValue = emptyList())
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             if (drawerOpen) {
                 // Open drawer and reset state in VM.
@@ -103,8 +99,8 @@ class MainActivity : ComponentActivity() {
                         onIconClicked = {
                             darkTheme.value = !darkTheme.value
                         },
-                        conversations = conversationsState,
-                        selectedConversation = selectedConversation
+                        conversations = uiState.conversations,
+                        selectedConversation = uiState.selectedConversation
                     ) {
                         Column(
                             modifier = Modifier
@@ -118,10 +114,10 @@ class MainActivity : ComponentActivity() {
                             Divider()
 
                             Conversation(
-                                messages = messages,
+                                messages = uiState.messages,
                                 onSendMessageListener = {
                                     viewModel.onSendMessage(
-                                        selectedConversation,
+                                        uiState.selectedConversation,
                                         it
                                     )
                                 })

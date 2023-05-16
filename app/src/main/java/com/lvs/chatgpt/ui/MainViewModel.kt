@@ -16,14 +16,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import java.lang.Exception
 import javax.inject.Inject
 
-
+//TODO: Error handling
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val conversationRepo: ConversationRepository,
@@ -35,16 +36,23 @@ class MainViewModel @Inject constructor(
         val TAG = MainViewModel::class.simpleName
     }
 
-    private val _selectedConversation = MutableStateFlow(DEFAULT_CONVERSATION_ID)
-    val selectedConversation: Flow<Long> = _selectedConversation
-
-    private val _messages = MutableStateFlow(emptyList<MessageEntity>())
-    val messages: Flow<List<MessageEntity>> = _messages
-
-    val conversationsFlow: Flow<List<ConversationEntity>> = conversationRepo.fetchConversations()
+    private val _uiState = MutableStateFlow(MainUiState())
+    val uiState = _uiState.asStateFlow()
 
     private val _drawerShouldBeOpened = MutableStateFlow(false)
     val drawerShouldBeOpened = _drawerShouldBeOpened.asStateFlow()
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            val conversations = conversationRepo.fetchConversations().first()
+            val selectedConversation = conversations.firstOrNull()?.id ?: DEFAULT_CONVERSATION_ID
+            _uiState.value = MainUiState(
+                conversations = conversations,
+                selectedConversation = selectedConversation,
+                messages = messageRepo.fetchMessages(selectedConversation).first()
+            )
+        }
+    }
 
     fun openDrawer() {
         _drawerShouldBeOpened.value = true
@@ -54,21 +62,18 @@ class MainViewModel @Inject constructor(
         _drawerShouldBeOpened.value = false
     }
 
-    private fun updateMessages(conversationId: Long) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _messages.value = messageRepo.fetchMessages(conversationId).firstOrNull() ?: emptyList()
-        }
-    }
-
     fun onSendMessage(conversationId: Long, message: String) {
 
-        if(message.isBlank()) return
+        if (message.isBlank()) return
 
         viewModelScope.launch(Dispatchers.IO) {
             val actualConversationId = if (conversationId == DEFAULT_CONVERSATION_ID) {
-                runCatching { conversationRepo.newConversation(message) }
+                runCatching {
+                    val insertedConversationId = conversationRepo.newConversation(message)
+                    _uiState.value = _uiState.value.copy(conversations = conversationRepo.fetchConversations().first())
+                    insertedConversationId
+                }
                     .onFailure { handleException(it) }
-                    .onSuccess { _selectedConversation.value = it }
                     .getOrThrow()
             } else conversationId
 
@@ -80,7 +85,12 @@ class MainViewModel @Inject constructor(
                     GPTRole.USER.value
                 )
             )
-            updateMessages(conversationId)
+
+            _uiState.value = _uiState.value.copy(
+                isFetching = true,
+                selectedConversation = actualConversationId
+            )
+
             val messages = messageRepo.fetchMessages(actualConversationId).firstOrNull()?.asReversed()
             //TODO: replace on converters
             try {
@@ -100,7 +110,10 @@ class MainViewModel @Inject constructor(
                     )
                 )
 
-                updateMessages(conversationId)
+                _uiState.value = _uiState.value.copy(
+                    isFetching = false,
+                    messages = messageRepo.fetchMessages(actualConversationId).first()
+                )
             } catch (ex: Exception) {
                 handleException(ex)
             }
@@ -114,12 +127,22 @@ class MainViewModel @Inject constructor(
     }
 
     fun onChatClicked(conversationId: Long) {
-        _selectedConversation.value = conversationId
-        updateMessages(conversationId)
+        //TODO: add error handling
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.value = _uiState.value.copy(
+                selectedConversation = conversationId,
+                messages = messageRepo.fetchMessages(conversationId).first()
+            )
+        }
     }
 
     fun onNewChatClicked() {
-        _selectedConversation.value = DEFAULT_CONVERSATION_ID
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.value = _uiState.value.copy(
+                selectedConversation = DEFAULT_CONVERSATION_ID,
+                messages = messageRepo.fetchMessages(DEFAULT_CONVERSATION_ID).first()
+            )
+        }
     }
 
 }
