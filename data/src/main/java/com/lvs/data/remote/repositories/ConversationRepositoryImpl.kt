@@ -8,7 +8,8 @@ class ConversationRepositoryImpl @Inject constructor(
     private val conversationsDao: ConversationsDao,
 ) : ConversationRepository {
 
-    override fun fetchConversations() = conversationsDao.getAllDesc()
+    override fun getConversationsFlow() = conversationsDao.getAllDesc()
+    override fun getConversations(): List<ConversationEntity> = conversationsDao.getAll()
 
     override fun newConversation(title: String) = conversationsDao.insert(ConversationEntity.InsertionPrototype(title))
 

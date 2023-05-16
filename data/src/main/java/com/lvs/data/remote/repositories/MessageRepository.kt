@@ -6,7 +6,9 @@ import kotlinx.coroutines.flow.Flow
 interface MessageRepository {
 
     fun getAll(): Flow<List<MessageEntity>>
-    fun fetchMessages(conversationId: Long): Flow<List<MessageEntity>>
-    fun createMessage(message: MessageEntity.InsertionPrototype) :Long
+    fun getMessagesFlow(conversationId: Long): Flow<List<MessageEntity>>
+    fun getMessages(conversationId: Long): List<MessageEntity>
+    fun insertMessage(message: MessageEntity.InsertionPrototype): Long
+    fun getMessageById(id: Long) : MessageEntity?
     fun deleteMessage(message: MessageEntity)
 }

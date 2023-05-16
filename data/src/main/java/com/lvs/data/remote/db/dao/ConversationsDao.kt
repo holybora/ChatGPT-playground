@@ -19,7 +19,10 @@ interface ConversationsDao {
     fun delete(conversation: ConversationEntity)
 
     @Query("SELECT * FROM conversations")
-    fun getAll(): Flow<List<ConversationEntity>>
+    fun getAllFlow(): Flow<List<ConversationEntity>>
+
+    @Query("SELECT * FROM conversations")
+    fun getAll(): List<ConversationEntity>
 
     @Query("SELECT * FROM conversations ORDER BY created_at DESC")
     fun getAllDesc(): Flow<List<ConversationEntity>>

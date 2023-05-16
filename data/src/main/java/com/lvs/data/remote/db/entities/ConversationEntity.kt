@@ -13,4 +13,8 @@ data class ConversationEntity(
     val createdAt: String,
 ){
     data class InsertionPrototype(val title: String)
+
+    companion object {
+        const val DEFAULT_CONVERSATION_ID = -1L
+    }
 }

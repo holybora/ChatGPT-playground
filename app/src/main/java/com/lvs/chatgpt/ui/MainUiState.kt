@@ -1,6 +1,7 @@
 package com.lvs.chatgpt.ui
 
 import com.lvs.data.remote.db.entities.ConversationEntity
+import com.lvs.data.remote.db.entities.ConversationEntity.Companion.DEFAULT_CONVERSATION_ID
 import com.lvs.data.remote.db.entities.MessageEntity
 
 data class MainUiState(
@@ -9,8 +10,5 @@ data class MainUiState(
     val messages: List<MessageEntity> = emptyList(),
     val selectedConversation: Long = DEFAULT_CONVERSATION_ID
 ) {
-    companion object {
-        const val DEFAULT_CONVERSATION_ID = -1L
 
-    }
 }

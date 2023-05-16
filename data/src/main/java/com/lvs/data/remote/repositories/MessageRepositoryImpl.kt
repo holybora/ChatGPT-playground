@@ -10,11 +10,18 @@ class MessageRepositoryImpl @Inject constructor(
 ) : MessageRepository {
     override fun getAll(): Flow<List<MessageEntity>> = messagesDao.getAll()
 
-    override fun fetchMessages(conversationId: Long): Flow<List<MessageEntity>> =
+    override fun getMessagesFlow(conversationId: Long): Flow<List<MessageEntity>> =
+        messagesDao.getAllByConversationIdFlow(conversationId)
+
+    override fun getMessages(conversationId: Long): List<MessageEntity> =
         messagesDao.getAllByConversationId(conversationId)
 
-    override fun createMessage(message: MessageEntity.InsertionPrototype): Long {
+    override fun insertMessage(message: MessageEntity.InsertionPrototype): Long {
         return messagesDao.insert(message)
+    }
+
+    override fun getMessageById(id: Long): MessageEntity? {
+        return messagesDao.getMessageById(id)
     }
 
     override fun deleteMessage(message: MessageEntity) =

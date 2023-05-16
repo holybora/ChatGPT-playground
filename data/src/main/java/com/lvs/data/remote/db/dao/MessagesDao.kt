@@ -22,7 +22,11 @@ interface MessagesDao {
     fun getAll(): Flow<List<MessageEntity>>
 
     @Query("SELECT * FROM messages WHERE conversation_id = :conversationId ORDER BY created_at DESC")
-    fun getAllByConversationId(conversationId: Long): Flow<List<MessageEntity>>
+    fun getAllByConversationIdFlow(conversationId: Long): Flow<List<MessageEntity>>
 
+    @Query("SELECT * FROM messages WHERE conversation_id = :conversationId ORDER BY created_at DESC")
+    fun getAllByConversationId(conversationId: Long): List<MessageEntity>
+    @Query("SELECT * FROM messages WHERE uid = :id")
+    fun getMessageById(id: Long): MessageEntity?
 
 }
