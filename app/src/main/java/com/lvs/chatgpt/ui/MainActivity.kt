@@ -24,12 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.lvs.chatgpt.ui.chat.Conversation
+import com.lvs.chatgpt.ui.chat.ChatConversation
 import com.lvs.chatgpt.ui.components.AppBar
 import com.lvs.chatgpt.ui.components.AppScaffold
 import com.lvs.chatgpt.ui.theme.ChatGPTTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,7 +77,6 @@ class MainActivity : ComponentActivity() {
             ChatGPTTheme(darkTheme.value) {
 
 
-
                 Surface(
                     color = MaterialTheme.colorScheme.background,
                 ) {
@@ -113,14 +111,16 @@ class MainActivity : ComponentActivity() {
                             })
                             Divider()
 
-                            Conversation(
+                            ChatConversation(
                                 messages = uiState.messages,
                                 onSendMessageListener = {
                                     viewModel.onSendMessage(
                                         uiState.selectedConversation,
                                         it
                                     )
-                                })
+                                },
+                                showLoadingChatResponse = uiState.isFetching
+                            )
                         }
                     }
                 }

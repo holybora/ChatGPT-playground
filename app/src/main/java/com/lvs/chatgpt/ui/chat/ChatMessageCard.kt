@@ -28,7 +28,7 @@ import com.lvs.data.remote.common.GPTRole
 import com.lvs.data.remote.db.entities.MessageEntity
 
 @Composable
-fun MessageCard(message: MessageEntity, isLast: Boolean = false) {
+fun ChatMessageCard(message: MessageEntity, isLast: Boolean = false) {
     val isBot = message.role == GPTRole.USER.value
     Column(
         horizontalAlignment = if (isBot) Alignment.End else Alignment.Start,

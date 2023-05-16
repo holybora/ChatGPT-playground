@@ -83,7 +83,6 @@ fun AppDrawer(
             selectedConversation = selectedConversation
         )
         DividerItem(modifier = Modifier.padding(horizontal = 28.dp))
-        DrawerItemHeader("Settings")
     }
 }
 

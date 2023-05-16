@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.material3.*
 import androidx.compose.material3.DrawerValue.Closed
 import androidx.compose.runtime.Composable
-import com.lvs.chatgpt.ui.theme.BackGroundColor
+import com.lvs.chatgpt.ui.theme.BackgroundColor
 import com.lvs.data.remote.db.entities.ConversationEntity
 
 //import androidx.compose.material3.ModalDrawerSheet
@@ -24,7 +24,7 @@ fun AppScaffold(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet(drawerContainerColor = BackGroundColor) {
+            ModalDrawerSheet(drawerContainerColor = BackgroundColor) {
                 AppDrawer(
                     onChatClicked = onChatClicked,
                     onNewChatClicked = onNewChatClicked,
