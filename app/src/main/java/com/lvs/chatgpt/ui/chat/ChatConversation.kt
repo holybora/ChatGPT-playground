@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.lvs.chatgpt.ui.theme.BackgroundColor
 import com.lvs.chatgpt.ui.theme.ChatGPTTheme
 import com.lvs.chatgpt.ui.theme.Purple40
 import com.lvs.data.remote.db.entities.MessageEntity
@@ -27,10 +26,9 @@ fun ChatConversation(
     onSendMessageListener: (String) -> Unit,
     showLoadingChatResponse: Boolean
 ) {
-    ChatGPTTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = BackgroundColor,
+            color = MaterialTheme.colorScheme.background,
         ) {
             Box(Modifier.fillMaxSize()) {
                 Column(Modifier.fillMaxSize()) {
@@ -45,7 +43,6 @@ fun ChatConversation(
                 }
             }
         }
-    }
 }
 
 

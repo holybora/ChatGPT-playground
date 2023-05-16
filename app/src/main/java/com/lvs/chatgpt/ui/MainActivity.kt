@@ -75,8 +75,6 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf(true)
             }
             ChatGPTTheme(darkTheme.value) {
-
-
                 Surface(
                     color = MaterialTheme.colorScheme.background,
                 ) {

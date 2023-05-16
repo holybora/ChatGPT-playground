@@ -18,13 +18,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.lvs.chatgpt.constant.urlToAvatarGPT
-import com.lvs.chatgpt.ui.theme.BackgroundColor
+
 import com.lvs.chatgpt.ui.theme.ChatGPTTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppBar(onClickMenu: () -> Unit) {
-    ChatGPTTheme {
         Surface(
             shadowElevation = 4.dp,
             tonalElevation = 0.dp,
@@ -68,10 +67,9 @@ fun AppBar(onClickMenu: () -> Unit) {
                     }
                 },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
-                    containerColor = BackgroundColor,
-                    titleContentColor = Color.White,
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
                 ),
             )
         }
-    }
 }

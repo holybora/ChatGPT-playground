@@ -1,5 +1,6 @@
 package com.lvs.chatgpt.ui.theme
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -19,7 +20,6 @@ val Typography = Typography(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
         fontSize = 13.sp,
-        color = ColorTextGPT,
     ),
     /* Other default text styles to override
     titleLarge = TextStyle(
