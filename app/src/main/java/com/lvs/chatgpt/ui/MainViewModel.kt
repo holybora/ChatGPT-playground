@@ -37,7 +37,7 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            val conversations = getConversations(Unit)
+            val conversations = getConversations()
             val selectedConversation = conversations.firstOrNull()?.id ?: DEFAULT_CONVERSATION_ID
             _uiState.value = MainUiState(
                 conversations = conversations,

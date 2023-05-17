@@ -1,22 +1,23 @@
 package com.lvs.chatgpt.ui.chat
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.lvs.chatgpt.ui.theme.ChatGPTTheme
 import com.lvs.chatgpt.ui.theme.Purple40
 import com.lvs.data.remote.db.entities.MessageEntity
 
@@ -26,32 +27,28 @@ fun ChatConversation(
     onSendMessageListener: (String) -> Unit,
     showLoadingChatResponse: Boolean
 ) {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background,
-        ) {
-            Box(Modifier.fillMaxSize()) {
-                Column(Modifier.fillMaxSize()) {
-                    ChatMessageList(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 16.dp),
-                        messages = messages
-                    )
-                    if (showLoadingChatResponse) BotPrintingView()
-                    ChatTextInput(onSendMessageListener)
-                }
-            }
-        }
+    Column(Modifier.fillMaxSize()) {
+        ChatMessageList(
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 16.dp),
+            messages = messages
+        )
+
+        AnimatedVisibility(visible = showLoadingChatResponse) { BotPrintingView() }
+
+        ChatTextInput(onSendMessageListener)
+    }
 }
 
 
-const val ConversationTestTag = "ConversationTestTag"
-
 @Composable
 fun BotPrintingView() {
-
-    Box(contentAlignment = Alignment.CenterEnd, modifier = Modifier.fillMaxWidth()) {
+    Box(
+        contentAlignment = Alignment.CenterEnd, modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp, end = 8.dp)
+    ) {
         Text(
             text = "Processing...",
             fontSize = 14.sp,
@@ -81,9 +78,7 @@ fun ChatMessageList(
         LazyColumn(
             contentPadding =
             WindowInsets.statusBars.add(WindowInsets(top = 90.dp)).asPaddingValues(),
-            modifier = Modifier
-                .testTag(ConversationTestTag)
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             reverseLayout = true,
             state = listState,
         ) {

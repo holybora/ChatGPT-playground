@@ -11,10 +11,9 @@ import javax.inject.Inject
 class SendMessageToChatGPTUseCase @Inject constructor(
     private val messagesRepository: MessageRepository,
     private val openAIRepository: OpenAIRepository
-) :
-    CoroutineUseCase<SendMessageToChatGPTUseCase.Params, List<MessageEntity>>() {
+) {
 
-    override suspend fun invoke(params: Params): List<MessageEntity> {
+    suspend operator fun invoke(params: Params): List<MessageEntity> {
 
         val messageId = messagesRepository.insertMessage(
             MessageEntity.InsertionPrototype(

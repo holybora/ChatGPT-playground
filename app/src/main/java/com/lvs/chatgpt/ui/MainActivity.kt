@@ -11,6 +11,8 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
@@ -22,11 +24,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lvs.chatgpt.ui.chat.ChatConversation
 import com.lvs.chatgpt.ui.components.AppBar
-import com.lvs.chatgpt.ui.components.AppScaffold
+import com.lvs.chatgpt.ui.components.AppDrawer
 import com.lvs.chatgpt.ui.theme.ChatGPTTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -35,7 +36,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    val viewModel: MainViewModel by viewModels()
+    private val viewModel: MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -78,67 +79,55 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    AppScaffold(
+                    ModalNavigationDrawer(
                         drawerState = drawerState,
-                        onChatClicked = {
-                            scope.launch {
-                                viewModel.onChatClicked(it)
-                                drawerState.close()
+                        drawerContent = {
+                            ModalDrawerSheet(drawerContainerColor = MaterialTheme.colorScheme.background) {
+                                AppDrawer(
+                                    onChatClicked = {
+                                        scope.launch {
+                                            viewModel.onChatClicked(it)
+                                            drawerState.close()
+                                        }
+                                    },
+                                    onNewChatClicked = {
+                                        scope.launch {
+                                            viewModel.onNewChatClicked()
+                                            drawerState.close()
+                                        }
+                                    },
+                                    onIconClicked = { darkTheme.value = !darkTheme.value },
+                                    selectedConversation = uiState.selectedConversation,
+                                    conversations = uiState.conversations
+                                )
                             }
                         },
-                        onNewChatClicked = {
-                            scope.launch {
-                                viewModel.onNewChatClicked()
-                                drawerState.close()
-                            }
-                        },
-                        onIconClicked = {
-                            darkTheme.value = !darkTheme.value
-                        },
-                        conversations = uiState.conversations,
-                        selectedConversation = uiState.selectedConversation
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                        ) {
-                            AppBar(onClickMenu = {
-                                scope.launch {
-                                    drawerState.open()
-                                }
-                            })
-                            Divider()
+                        content = {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                            ) {
+                                AppBar(onClickMenu = {
+                                    scope.launch {
+                                        drawerState.open()
+                                    }
+                                })
+                                Divider()
 
-                            ChatConversation(
-                                messages = uiState.messages,
-                                onSendMessageListener = {
-                                    viewModel.onSendMessage(
-                                        uiState.selectedConversation,
-                                        it
-                                    )
-                                },
-                                showLoadingChatResponse = uiState.isFetching
-                            )
-                        }
-                    }
+                                ChatConversation(
+                                    messages = uiState.messages,
+                                    onSendMessageListener = {
+                                        viewModel.onSendMessage(
+                                            uiState.selectedConversation,
+                                            it
+                                        )
+                                    },
+                                    showLoadingChatResponse = uiState.isFetching
+                                )
+                            }
+                        })
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ChatGPTTheme {
-        Greeting("Android")
     }
 }

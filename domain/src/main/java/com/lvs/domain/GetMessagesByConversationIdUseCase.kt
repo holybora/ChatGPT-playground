@@ -5,9 +5,8 @@ import com.lvs.data.remote.db.entities.MessageEntity
 import com.lvs.data.remote.repositories.MessageRepository
 import javax.inject.Inject
 
-class GetMessagesByConversationIdUseCase @Inject constructor(private val messageRepository: MessageRepository) :
-    CoroutineUseCase<Long, List<MessageEntity>>() {
-    override suspend fun invoke(params: Long): List<MessageEntity> =
+class GetMessagesByConversationIdUseCase @Inject constructor(private val messageRepository: MessageRepository) {
+    operator fun invoke(params: Long): List<MessageEntity> =
         if (params == ConversationEntity.DEFAULT_CONVERSATION_ID) emptyList()
         else messageRepository.getMessages(params)
 
