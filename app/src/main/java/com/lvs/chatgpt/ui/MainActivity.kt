@@ -44,7 +44,6 @@ class MainActivity : ComponentActivity() {
 
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
             val drawerOpen by viewModel.drawerShouldBeOpened.collectAsStateWithLifecycle()
-
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             if (drawerOpen) {
@@ -61,15 +60,10 @@ class MainActivity : ComponentActivity() {
 
             // Intercepts back navigation when the drawer is open
             val scope = rememberCoroutineScope()
-            val focusManager = LocalFocusManager.current
 
-            BackHandler {
-                if (drawerState.isOpen) {
-                    scope.launch {
-                        drawerState.close()
-                    }
-                } else {
-                    focusManager.clearFocus()
+            BackHandler(enabled = drawerState.isOpen) {
+                scope.launch {
+                    drawerState.close()
                 }
             }
             val darkTheme = remember(key1 = "darkTheme") {
