@@ -1,8 +1,8 @@
 plugins {
-    id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
-    id 'org.jetbrains.kotlin.kapt'
-    id 'com.google.dagger.hilt.android'
+    alias libs.plugins.android.application
+    alias libs.plugins.android.kotlin
+    alias libs.plugins.kotlin.kapt
+    alias libs.plugins.android.hilt
 }
 
 android {
@@ -32,7 +32,7 @@ android {
 }
 
 dependencies {
-    api project(path: ':data')
+    implementation project(path: ':data')
 
     def hilt = '2.44'
     kapt  "com.google.dagger:hilt-compiler:$hilt"

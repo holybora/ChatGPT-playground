@@ -1,8 +1,9 @@
 plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
-    id 'kotlin-kapt'
-    id 'com.google.dagger.hilt.android'
+    alias libs.plugins.android.application
+    alias libs.plugins.android.kotlin
+    alias libs.plugins.kotlin.kapt
+    alias libs.plugins.android.hilt
+    alias libs.plugins.devtools.ksp
 }
 
 android {
@@ -59,41 +60,39 @@ kapt {
 
 dependencies {
     implementation project(path: ':domain')
+    implementation project(path: ':data')
 
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+    implementation libs.androidx.lifecycle.compose
 
-    def activity_version = "1.7.1"
-    implementation "androidx.activity:activity-ktx:$activity_version"
-    implementation "androidx.activity:activity-compose:$activity_version"
+    implementation libs.androidx.activity.compose
+    implementation libs.androidx.activity.ktx
 
+    implementation(platform(libs.androidx.compose.bom))
+    implementation libs.androidx.compose.ui.graphics
+    implementation libs.androidx.compose.ui.tooling.preview
+    implementation libs.androidx.compose.material3
+    implementation libs.androidx.compose.material.icons.extended
 
-    implementation platform('androidx.compose:compose-bom:2023.05.00')
-    implementation 'androidx.compose.ui:ui'
-    implementation 'androidx.compose.ui:ui-graphics'
-    implementation 'androidx.compose.ui:ui-tooling-preview'
-    implementation 'androidx.compose.material3:material3'
-    implementation 'androidx.compose.material:material-icons-extended'
+    implementation libs.androidx.navigation.compose
+    implementation libs.io.coil
 
-
-    def lifecycle_version = "2.6.1"
-    implementation "androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_version"
-
-    def nav_version = "2.5.3"
-
-    implementation "androidx.navigation:navigation-compose:$nav_version"
-
-    // UI/UX Utils
-    def richtext_version = '0.16.0'
-    implementation "com.halilibo.compose-richtext:richtext-commonmark:${richtext_version}"
-    implementation "com.halilibo.compose-richtext:richtext-ui-material:${richtext_version}"
-    implementation "com.halilibo.compose-richtext:richtext-ui-material3:${richtext_version}"
-
-
-    implementation "io.coil-kt:coil-compose:2.3.0"
 
     def hilt = '2.44'
     kapt  "com.google.dagger:hilt-compiler:$hilt"
     implementation  "com.google.dagger:hilt-android:$hilt"
+
+    def retrofit = '2.9.0'
+    implementation "com.squareup.retrofit2:retrofit:$retrofit"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit"
+    def okhttp = '4.10.0'
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttp"
+
+    def room_version = "2.5.1"
+
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    ksp  "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
 
 
     //TODO: should I bring together all lib versions?
