@@ -34,7 +34,6 @@ android {
 dependencies {
     implementation project(path: ':data')
 
-    def hilt = '2.44'
-    kapt  "com.google.dagger:hilt-compiler:$hilt"
-    implementation  "com.google.dagger:hilt-android:$hilt"
+    kapt  libs.hilt.comliper
+    implementation  libs.hilt.android
 }

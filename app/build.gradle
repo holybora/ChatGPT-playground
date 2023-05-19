@@ -76,34 +76,18 @@ dependencies {
     implementation libs.androidx.navigation.compose
     implementation libs.io.coil
 
+    kapt  libs.hilt.comliper
+    implementation  libs.hilt.android
 
-    def hilt = '2.44'
-    kapt  "com.google.dagger:hilt-compiler:$hilt"
-    implementation  "com.google.dagger:hilt-android:$hilt"
+    implementation libs.retrofit.base
+    implementation libs.retrofit.gson
+    implementation libs.okhttp.logging
 
-    def retrofit = '2.9.0'
-    implementation "com.squareup.retrofit2:retrofit:$retrofit"
-    implementation "com.squareup.retrofit2:converter-gson:$retrofit"
-    def okhttp = '4.10.0'
-    implementation "com.squareup.okhttp3:logging-interceptor:$okhttp"
+    implementation libs.room.runtime
+    annotationProcessor libs.room.compiler
+    implementation libs.room.ktx
+    ksp  libs.room.compiler
 
-    def room_version = "2.5.1"
+    androidTestImplementation libs.kotlinx.coroutines.test
 
-    implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
-    ksp  "androidx.room:room-compiler:$room_version"
-    implementation "androidx.room:room-ktx:$room_version"
-
-
-    //TODO: should I bring together all lib versions?
-    def coroutines = '1.7.0'
-    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines"
-
-
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    debugImplementation 'androidx.compose.ui:ui-tooling'
-    debugImplementation 'androidx.compose.ui:ui-test-manifest'
 }

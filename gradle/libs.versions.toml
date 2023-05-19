@@ -6,12 +6,18 @@ compose_bom = "2023.05.01"
 nav_version = "2.5.3"
 coil = "2.3.0"
 hilt = '2.45'
+room = '2.5.1'
 
 androidGradlePlugin = "7.4.2"
 kotliPlugin = '1.8.20'
-hiltAndroidPlugin ='2.44'
+hiltAndroidPlugin = '2.44'
 kspPlugin = '1.8.20-1.0.11'
 kaptPlugin = '1.8.21'
+
+retrofit = '2.9.0'
+
+okhttp = '4.10.0'
+coroutines = '1.7.0'
 ##id 'com.google.dagger.hilt.android' version '2.44' apply false
 ##id 'com.google.devtools.ksp' version '1.8.20-1.0.11' apply false
 
@@ -27,8 +33,17 @@ androidx-compose-material-icons-extended = { group = "androidx.compose.material"
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "nav_version" }
 
 io-coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
-hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-comliper = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 
+retrofit-base = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+kotlinx-coroutines-test = { group =  "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
+kotlinx-coroutines-android = { group =  "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 
 
 [plugins]
