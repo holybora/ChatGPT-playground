@@ -1,5 +1,5 @@
 plugins {
-    alias libs.plugins.android.application
+    alias libs.plugins.android.library
     alias libs.plugins.android.kotlin
     alias libs.plugins.kotlin.kapt
     alias libs.plugins.android.hilt
@@ -39,11 +39,10 @@ dependencies {
     implementation libs.retrofit.gson
     implementation libs.okhttp.logging
 
-    implementation libs.kotlinx.coroutines.android
 
     kapt  libs.hilt.comliper
     implementation  libs.hilt.android
-
+    implementation libs.kotlinx.coroutines.android
     implementation libs.room.runtime
     annotationProcessor libs.room.compiler
     implementation libs.room.ktx
