@@ -11,10 +11,18 @@ data class ConversationEntity(
     val title: String,
     @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
     val createdAt: String,
-){
+) {
     data class InsertionPrototype(val title: String)
 
     companion object {
         const val DEFAULT_CONVERSATION_ID = -1L
+
     }
+
+    data class UpdateTitle(
+        val id: Long,
+        val title: String,
+    )
 }
+
+fun ConversationEntity.toUpdateTitle(newTitle: String) = ConversationEntity.UpdateTitle(this.id, title = newTitle)

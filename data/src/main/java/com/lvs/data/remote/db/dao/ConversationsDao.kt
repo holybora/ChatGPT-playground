@@ -5,6 +5,8 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
+import androidx.room.Upsert
 import com.lvs.data.remote.db.entities.ConversationEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -14,6 +16,9 @@ interface ConversationsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE, entity = ConversationEntity::class)
     fun insert(conversation: ConversationEntity.InsertionPrototype): Long
+
+    @Upsert
+    fun upsert(conversation: ConversationEntity): Long
 
     @Delete
     fun delete(conversation: ConversationEntity)
@@ -26,6 +31,7 @@ interface ConversationsDao {
 
     @Query("SELECT * FROM conversations ORDER BY created_at DESC")
     fun getAllDesc(): Flow<List<ConversationEntity>>
-
+    @Query("SELECT * FROM conversations WHERE id = :conversationId")
+    fun getConversationById(conversationId: Long): ConversationEntity?
 
 }

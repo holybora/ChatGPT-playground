@@ -1,7 +1,6 @@
-package com.lvs.chatgpt.ui
+package com.lvs.chatgpt.ui.main
 
 import android.os.Bundle
-import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -10,30 +9,27 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.lvs.chatgpt.ui.chat.ChatConversation
+import androidx.navigation.compose.rememberNavController
+import com.lvs.chatgpt.ui.chat.ChatScreen
 import com.lvs.chatgpt.ui.components.AppBar
 import com.lvs.chatgpt.ui.components.AppDrawer
 import com.lvs.chatgpt.ui.theme.ChatGPTTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import com.lvs.chatgpt.ui.main.MainEvent.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
@@ -44,17 +40,17 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-            val drawerOpen by viewModel.drawerShouldBeOpened.collectAsStateWithLifecycle()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val navController = rememberNavController()
 
-            if (drawerOpen) {
+            if (uiState.drawerShouldBeOpen) {
                 // Open drawer and reset state in VM.
                 LaunchedEffect(Unit) {
                     // wrap in try-finally to handle interruption whiles opening drawer
                     try {
                         drawerState.open()
                     } finally {
-                        viewModel.resetOpenDrawerAction()
+                        viewModel.setEvent(OnResetOpenDrawerAction)
                     }
                 }
             }
@@ -81,48 +77,40 @@ class MainActivity : ComponentActivity() {
                                 AppDrawer(
                                     onChatClicked = {
                                         scope.launch {
-                                            viewModel.onChatClicked(it)
+                                            viewModel.setEvent(OnChatClicked(it))
                                             drawerState.close()
                                         }
                                     },
                                     onNewChatClicked = {
                                         scope.launch {
-                                            viewModel.onNewChatClicked()
+                                            viewModel.setEvent(OnNewChatClicked)
                                             drawerState.close()
                                         }
                                     },
                                     onIconClicked = { darkTheme.value = !darkTheme.value },
-                                    selectedConversation = uiState.selectedConversation,
+                                    selectedConversation = uiState.selectedConversationId,
                                     conversations = uiState.conversations
                                 )
                             }
                         },
                         content = {
                             Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
+                                modifier = Modifier.fillMaxSize()
                             ) {
-                                AppBar(onClickMenu = {
-                                    scope.launch {
-                                        drawerState.open()
-                                    }
-                                })
+                                AppBar(onClickMenu = { scope.launch { drawerState.open() } })
                                 Divider()
 
-                                ChatConversation(
-                                    messages = uiState.messages,
-                                    onSendMessageListener = {
-                                        viewModel.onSendMessage(
-                                            uiState.selectedConversation,
-                                            it
-                                        )
-                                    },
-                                    showLoadingChatResponse = uiState.isFetching
+                                ChatScreen(
+                                    onSendMessage = { viewModel.handleEvent(OnSendMessage(it)) },
+                                    uiState = uiState
                                 )
                             }
-                        })
+                        }
+                    )
                 }
+
             }
+
         }
     }
 }

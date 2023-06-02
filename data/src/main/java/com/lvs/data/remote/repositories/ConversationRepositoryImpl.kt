@@ -10,7 +10,11 @@ class ConversationRepositoryImpl @Inject constructor(
 
     override fun getConversationsFlow() = conversationsDao.getAllDesc()
     override fun getConversations(): List<ConversationEntity> = conversationsDao.getAll()
+    override fun getConversationById(conversationId: Long): ConversationEntity? =
+        conversationsDao.getConversationById(conversationId)
+
     override fun newConversation(title: String) = conversationsDao.insert(ConversationEntity.InsertionPrototype(title))
     override fun deleteConversation(conversation: ConversationEntity) = conversationsDao.delete(conversation)
+    override fun updateConversation(conversation: ConversationEntity) = conversationsDao.upsert(conversation)
 
 }
