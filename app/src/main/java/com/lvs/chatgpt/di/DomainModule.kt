@@ -1,5 +1,6 @@
 package com.lvs.chatgpt.di
 
+import com.lvs.data.converters.MessagesDataToUiConverter
 import com.lvs.data.remote.repositories.ConversationRepository
 import com.lvs.data.remote.repositories.MessageRepository
 import com.lvs.data.remote.repositories.OpenAIRepository
@@ -29,13 +30,22 @@ object DomainModule {
     fun provideSendMessageToGPTUseCase(
         messagesRepository: MessageRepository,
         openAIRepository: OpenAIRepository,
-        conversationRepository: ConversationRepository
+        conversationRepository: ConversationRepository,
+        messagesDataToUiConverter: MessagesDataToUiConverter
     ) =
-        SendMessageToChatGPTUseCase(conversationRepository, messagesRepository, openAIRepository)
+        SendMessageToChatGPTUseCase(
+            conversationRepository,
+            messagesRepository,
+            openAIRepository,
+            messagesDataToUiConverter
+        )
 
     @Provides
-    fun provideGetMessagesByConversationIdUseCase(messagesRepository: MessageRepository) =
-        GetMessagesByConversationIdUseCase(messagesRepository)
+    fun provideGetMessagesByConversationIdUseCase(
+        messagesRepository: MessageRepository,
+        messagesDataToUiConverter: MessagesDataToUiConverter
+    ) =
+        GetMessagesByConversationIdUseCase(messagesRepository, messagesDataToUiConverter)
 
     @Provides
     fun provideConversationsFlowUseCase(conversationRepository: ConversationRepository) =

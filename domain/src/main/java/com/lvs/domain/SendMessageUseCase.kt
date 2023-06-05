@@ -1,5 +1,7 @@
 package com.lvs.domain
 
+import com.lvs.data.converters.MessagesDataToUiConverter
+import com.lvs.data.local.main.MessageUiEntity
 import com.lvs.data.remote.api.enities.MessageDto
 import com.lvs.data.remote.common.GPTModel
 import com.lvs.data.remote.common.GPTRole
@@ -13,10 +15,11 @@ import javax.inject.Inject
 class SendMessageToChatGPTUseCase @Inject constructor(
     private val conversationsRepository: ConversationRepository,
     private val messagesRepository: MessageRepository,
-    private val openAIRepository: OpenAIRepository
+    private val openAIRepository: OpenAIRepository,
+    private val messagesDataToUiConverter: MessagesDataToUiConverter
 ) {
 
-    suspend operator fun invoke(params: Params): List<MessageEntity> {
+    suspend operator fun invoke(params: Params): List<MessageUiEntity> {
 
         val messageId = messagesRepository.insertMessage(
             MessageEntity.InsertionPrototype(
@@ -44,10 +47,10 @@ class SendMessageToChatGPTUseCase @Inject constructor(
                 messages = params.messagesForContext
                     .asReversed()
                     .toMutableList()
-                    .also { it.add(newMessage) }
+                    .also { it.add(messagesDataToUiConverter.convert(newMessage)) }
                     .map {
                         MessageDto(
-                            role = it.role,
+                            role = it.role.value,
                             content = it.text
                         )
                     })
@@ -63,10 +66,12 @@ class SendMessageToChatGPTUseCase @Inject constructor(
             )
         )
 
-        return messagesRepository.getMessages(params.conversationId)
+        return messagesRepository
+            .getMessages(params.conversationId)
+            .map { messagesDataToUiConverter.convert(it) }
 
     }
 
-    data class Params(val textToSend: String, val messagesForContext: List<MessageEntity>, val conversationId: Long)
+    data class Params(val textToSend: String, val messagesForContext: List<MessageUiEntity>, val conversationId: Long)
 
 }

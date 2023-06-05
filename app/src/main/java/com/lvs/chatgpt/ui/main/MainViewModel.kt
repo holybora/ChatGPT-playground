@@ -3,7 +3,6 @@ package com.lvs.chatgpt.ui.main
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.lvs.chatgpt.base.BaseViewModel
-import com.lvs.data.remote.db.entities.ConversationEntity
 import com.lvs.data.remote.db.entities.ConversationEntity.Companion.DEFAULT_CONVERSATION_ID
 import com.lvs.domain.CreateConversationUseCase
 import com.lvs.domain.GetConversationUseCase
@@ -25,14 +24,39 @@ class MainViewModel @Inject constructor(
     private val getMessagesByConversationId: GetMessagesByConversationIdUseCase
 ) : BaseViewModel<MainEvent, MainUiState, MainEffect>() {
 
-    companion object {
-        val TAG = MainViewModel::class.simpleName
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            getConversationsFlowUseCase().collect {
+                setState {
+                    copy(conversations = it)
+                }
+            }
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val conversations = getConversations()
+            val selectedConversation = conversations.firstOrNull()
+            val selectedConversationId = selectedConversation?.id
+                ?: runCatching { createConversation("New Chat") }
+                    .onFailure { handleException(it) }
+                    .getOrThrow()
+
+            setState {
+                copy(
+                    conversations = conversations,
+                    selectedConversationId = selectedConversationId,
+                    messages = getMessagesByConversationId(selectedConversationId)
+                )
+            }
+        }
     }
 
     override fun createInitialState(): MainUiState = MainUiState()
     override fun handleEvent(event: MainEvent) {
         when (event) {
             is MainEvent.OnChatClicked -> {
+                if(event.chatId == currentState.selectedConversationId) return
+
                 viewModelScope.launch(Dispatchers.IO) {
                     setState {
                         copy(
@@ -40,14 +64,18 @@ class MainViewModel @Inject constructor(
                             messages = getMessagesByConversationId(event.chatId)
                         )
                     }
+                    setEffect { MainEffect.ScrollChatToZero }
                 }
             }
 
-            is MainEvent.OnNewChatClicked -> setState {
-                copy(
-                    selectedConversationId = DEFAULT_CONVERSATION_ID,
-                    messages = emptyList()
-                )
+            is MainEvent.OnNewChatClicked -> {
+                setState {
+                    copy(
+                        selectedConversationId = DEFAULT_CONVERSATION_ID,
+                        messages = emptyList()
+                    )
+                }
+                setEffect { MainEffect.ScrollChatToZero }
             }
 
             is MainEvent.OnOpenDrawer -> setState {
@@ -93,37 +121,12 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    init {
-
-        viewModelScope.launch(Dispatchers.IO) {
-            getConversationsFlowUseCase().collect {
-                setState {
-                    copy(conversations = it)
-                }
-            }
-        }
-
-        viewModelScope.launch(Dispatchers.IO) {
-            val conversations = getConversations()
-            val selectedConversation = conversations.firstOrNull()
-            val selectedConversationId = selectedConversation?.id
-                ?: runCatching { createConversation("New Chat") }
-                    .onFailure { handleException(it) }
-                    .getOrThrow()
-
-            setState {
-                copy(
-                    conversations = conversations,
-                    selectedConversationId = selectedConversationId,
-                    messages = getMessagesByConversationId(selectedConversationId)
-                )
-            }
-        }
-    }
-
     private fun handleException(exception: Throwable) {
         Log.e(TAG, exception.toString())
     }
 
 
+    companion object {
+        val TAG = MainViewModel::class.simpleName
+    }
 }

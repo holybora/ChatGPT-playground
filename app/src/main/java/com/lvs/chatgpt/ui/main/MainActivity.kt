@@ -1,6 +1,7 @@
 package com.lvs.chatgpt.ui.main
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -19,10 +20,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.compose.rememberNavController
-import com.lvs.chatgpt.ui.chat.ChatScreen
 import com.lvs.chatgpt.ui.components.AppBar
 import com.lvs.chatgpt.ui.components.AppDrawer
 import com.lvs.chatgpt.ui.theme.ChatGPTTheme
@@ -41,7 +47,6 @@ class MainActivity : ComponentActivity() {
 
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            val navController = rememberNavController()
 
             if (uiState.drawerShouldBeOpen) {
                 // Open drawer and reset state in VM.
@@ -55,8 +60,22 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
+
             // Intercepts back navigation when the drawer is open
             val scope = rememberCoroutineScope()
+
+            //I don't know does it good idea or not, I'm experimenting
+            var scrollToBottom by remember { mutableStateOf(Double.MAX_VALUE) }
+
+            LaunchedEffect(Unit) {
+                viewModel.effect.collect {
+                    Log.i("MainActivity", "New effect $it")
+                    when (it) {
+                        MainEffect.ScrollChatToZero -> scrollToBottom = Math.random()
+                    }
+                }
+            }
+
 
             BackHandler(enabled = drawerState.isOpen) {
                 scope.launch {
@@ -100,9 +119,13 @@ class MainActivity : ComponentActivity() {
                                 AppBar(onClickMenu = { scope.launch { drawerState.open() } })
                                 Divider()
 
-                                ChatScreen(
-                                    onSendMessage = { viewModel.handleEvent(OnSendMessage(it)) },
-                                    uiState = uiState
+                                ChatConversation(
+                                    messages = uiState.messages,
+                                    onSendMessageListener = {
+                                        viewModel.handleEvent(OnSendMessage(it))
+                                    },
+                                    showLoadingChatResponse = uiState.isFetching,
+                                    scrollToBottom = scrollToBottom
                                 )
                             }
                         }
