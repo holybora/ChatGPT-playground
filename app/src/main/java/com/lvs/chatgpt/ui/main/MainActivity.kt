@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.MaterialTheme
@@ -63,15 +64,13 @@ class MainActivity : ComponentActivity() {
 
             // Intercepts back navigation when the drawer is open
             val scope = rememberCoroutineScope()
-
-            //I don't know does it good idea or not, I'm experimenting
-            var scrollToBottom by remember { mutableStateOf(Double.MAX_VALUE) }
+            val chatListState = rememberLazyListState()
 
             LaunchedEffect(Unit) {
                 viewModel.effect.collect {
                     Log.i("MainActivity", "New effect $it")
                     when (it) {
-                        MainEffect.ScrollChatToZero -> scrollToBottom = Math.random()
+                        MainEffect.ScrollChatToZero -> chatListState.scrollToItem(0)
                     }
                 }
             }
@@ -125,7 +124,7 @@ class MainActivity : ComponentActivity() {
                                         viewModel.handleEvent(OnSendMessage(it))
                                     },
                                     showLoadingChatResponse = uiState.isFetching,
-                                    scrollToBottom = scrollToBottom
+                                    listState = chatListState
                                 )
                             }
                         }

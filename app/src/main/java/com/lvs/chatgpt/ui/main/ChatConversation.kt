@@ -6,6 +6,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -49,10 +50,10 @@ fun ChatConversation(
     messages: List<MessageUiEntity>,
     onSendMessageListener: (String) -> Unit,
     showLoadingChatResponse: Boolean,
-    scrollToBottom: Double
+    listState: LazyListState = rememberLazyListState()
 ) {
     Column(Modifier.fillMaxSize()) {
-        ChatMessageList(messages = messages, scrollToBottom = scrollToBottom)
+        ChatMessageList(messages = messages, listState = listState)
 
         AnimatedVisibility(visible = showLoadingChatResponse) { BotPrintingView() }
 
@@ -86,13 +87,11 @@ fun BotPrintingViewPreview() {
     BotPrintingView()
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ColumnScope.ChatMessageList(
     messages: List<MessageUiEntity>,
-    scrollToBottom: Double
+    listState: LazyListState = rememberLazyListState()
 ) {
-    val listState = rememberLazyListState()
 
     Box(
         modifier = Modifier
@@ -117,14 +116,6 @@ fun ColumnScope.ChatMessageList(
             }
         }
     }
-
-
-    Log.i("ChatMessageList", "Double $scrollToBottom")
-    LaunchedEffect(scrollToBottom) {
-        Log.i("ChatMessageList", "LaunchedEffect should perform")
-        listState.scrollToItem(0)
-    }
-
 }
 
 @Composable
