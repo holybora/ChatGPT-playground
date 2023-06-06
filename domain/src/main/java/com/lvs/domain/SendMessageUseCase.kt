@@ -21,23 +21,11 @@ class SendMessageToChatGPTUseCase @Inject constructor(
 
     suspend operator fun invoke(params: Params): List<MessageUiEntity> {
 
-        val messageId = messagesRepository.insertMessage(
-            MessageEntity.InsertionPrototype(
-                params.conversationId,
-                params.textToSend,
-                GPTRole.USER.value
-            )
-        )
-
-        val newMessage = messagesRepository.getMessageById(messageId)
-
-        requireNotNull(newMessage) { "TODO: Handle DB exceptions" }
-
         if (params.messagesForContext.isEmpty()) {
             val conversation = conversationsRepository.getConversationById(params.conversationId)
                 ?: throw IllegalStateException("Conversation with id = ${params.conversationId} not found")
 
-            conversationsRepository.updateConversation(conversation.copy(title = newMessage.text))
+            conversationsRepository.updateConversation(conversation.copy(title = params.messagesForContext.first().text))
         }
 
         //TODO: replace on converters
@@ -47,7 +35,6 @@ class SendMessageToChatGPTUseCase @Inject constructor(
                 messages = params.messagesForContext
                     .asReversed()
                     .toMutableList()
-                    .also { it.add(messagesDataToUiConverter.convert(newMessage)) }
                     .map {
                         MessageDto(
                             role = it.role.value,
@@ -56,7 +43,6 @@ class SendMessageToChatGPTUseCase @Inject constructor(
                     })
         //TODO: think how better choose response message
         val responseMessage = response.choices.first().message
-
 
         messagesRepository.insertMessage(
             MessageEntity.InsertionPrototype(
@@ -72,6 +58,9 @@ class SendMessageToChatGPTUseCase @Inject constructor(
 
     }
 
-    data class Params(val textToSend: String, val messagesForContext: List<MessageUiEntity>, val conversationId: Long)
+    data class Params(
+        val messagesForContext: List<MessageUiEntity>,
+        val conversationId: Long
+    )
 
 }

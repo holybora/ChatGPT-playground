@@ -8,6 +8,7 @@ import com.lvs.domain.CreateConversationUseCase
 import com.lvs.domain.GetConversationUseCase
 import com.lvs.domain.GetConversationsFlowUseCase
 import com.lvs.domain.GetMessagesByConversationIdUseCase
+import com.lvs.domain.InsertMessageUseCase
 import com.lvs.domain.SendMessageToChatGPTUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +22,7 @@ class MainViewModel @Inject constructor(
     private val createConversation: CreateConversationUseCase,
     private val getConversationsFlowUseCase: GetConversationsFlowUseCase,
     private val sendMessageToChatGPT: SendMessageToChatGPTUseCase,
+    private val insertMessageUseCase: InsertMessageUseCase,
     private val getMessagesByConversationId: GetMessagesByConversationIdUseCase
 ) : BaseViewModel<MainEvent, MainUiState, MainEffect>() {
 
@@ -55,7 +57,7 @@ class MainViewModel @Inject constructor(
     override fun handleEvent(event: MainEvent) {
         when (event) {
             is MainEvent.OnChatClicked -> {
-                if(event.chatId == currentState.selectedConversationId) return
+                if (event.chatId == currentState.selectedConversationId) return
 
                 viewModelScope.launch(Dispatchers.IO) {
                     setState {
@@ -64,7 +66,6 @@ class MainViewModel @Inject constructor(
                             messages = getMessagesByConversationId(event.chatId)
                         )
                     }
-                    setEffect { MainEffect.ScrollChatToZero }
                 }
             }
 
@@ -75,7 +76,6 @@ class MainViewModel @Inject constructor(
                         messages = emptyList()
                     )
                 }
-                setEffect { MainEffect.ScrollChatToZero }
             }
 
             is MainEvent.OnOpenDrawer -> setState {
@@ -101,10 +101,19 @@ class MainViewModel @Inject constructor(
                                 .onFailure { handleException(it) }
                                 .getOrThrow()
 
+
+                    val insertedMessage = insertMessageUseCase(
+                        InsertMessageUseCase.Params(
+                            textToSend = event.message,
+                            conversationId = actualConversationId
+                        )
+                    )
+
+                    setState { copy(messages = listOf(insertedMessage) + messages) }
+
                     val actualMessages = sendMessageToChatGPT(
                         SendMessageToChatGPTUseCase.Params(
-                            textToSend = event.message,
-                            messagesForContext = currentState.messages,
+                            messagesForContext = currentState.messages.take(3),
                             conversationId = actualConversationId
                         )
                     )

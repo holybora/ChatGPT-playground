@@ -8,6 +8,7 @@ import com.lvs.domain.CreateConversationUseCase
 import com.lvs.domain.GetConversationUseCase
 import com.lvs.domain.GetConversationsFlowUseCase
 import com.lvs.domain.GetMessagesByConversationIdUseCase
+import com.lvs.domain.InsertMessageUseCase
 import com.lvs.domain.SendMessageToChatGPTUseCase
 import dagger.Module
 import dagger.Provides
@@ -50,5 +51,14 @@ object DomainModule {
     @Provides
     fun provideConversationsFlowUseCase(conversationRepository: ConversationRepository) =
         GetConversationsFlowUseCase(conversationRepository)
+
+    @Provides
+    fun provideInsertMessageUseCase(
+        messagesRepository: MessageRepository,
+        messagesDataToUiConverter: MessagesDataToUiConverter
+    ) = InsertMessageUseCase(
+        messagesRepository = messagesRepository,
+        messagesDataToUiConverter = messagesDataToUiConverter
+    )
 
 }

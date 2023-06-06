@@ -21,15 +21,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.compose.rememberNavController
 import com.lvs.chatgpt.ui.components.AppBar
 import com.lvs.chatgpt.ui.components.AppDrawer
 import com.lvs.chatgpt.ui.theme.ChatGPTTheme
@@ -65,14 +58,8 @@ class MainActivity : ComponentActivity() {
             // Intercepts back navigation when the drawer is open
             val scope = rememberCoroutineScope()
             val chatListState = rememberLazyListState()
-
-            LaunchedEffect(Unit) {
-                viewModel.effect.collect {
-                    Log.i("MainActivity", "New effect $it")
-                    when (it) {
-                        MainEffect.ScrollChatToZero -> chatListState.scrollToItem(0)
-                    }
-                }
+            LaunchedEffect(uiState.messages.size + uiState.isFetching.hashCode()) {
+                chatListState.animateScrollToItem(0)
             }
 
 
@@ -123,7 +110,7 @@ class MainActivity : ComponentActivity() {
                                     onSendMessageListener = {
                                         viewModel.handleEvent(OnSendMessage(it))
                                     },
-                                    showLoadingChatResponse = uiState.isFetching,
+                                    showLoading = uiState.isFetching,
                                     listState = chatListState
                                 )
                             }
