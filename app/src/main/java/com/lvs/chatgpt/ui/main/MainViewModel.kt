@@ -1,7 +1,6 @@
 package com.lvs.chatgpt.ui.main
 
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.lvs.chatgpt.base.BaseViewModel
 import com.lvs.data.remote.db.entities.ConversationEntity.Companion.DEFAULT_CONVERSATION_ID
 import com.lvs.domain.CreateConversationUseCase
@@ -11,8 +10,6 @@ import com.lvs.domain.GetMessagesByConversationIdUseCase
 import com.lvs.domain.InsertMessageUseCase
 import com.lvs.domain.SendMessageToChatGPTUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 //TODO: Error handling
@@ -27,7 +24,7 @@ class MainViewModel @Inject constructor(
 ) : BaseViewModel<MainEvent, MainUiState, MainEffect>() {
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchOnBackground {
             getConversationsFlowUseCase().collect {
                 setState {
                     copy(conversations = it)
@@ -35,7 +32,7 @@ class MainViewModel @Inject constructor(
             }
         }
 
-        viewModelScope.launch(Dispatchers.IO) {
+        launchOnBackground {
             val conversations = getConversations()
             val selectedConversation = conversations.firstOrNull()
             val selectedConversationId = selectedConversation?.id
@@ -59,7 +56,7 @@ class MainViewModel @Inject constructor(
             is MainEvent.OnChatClicked -> {
                 if (event.chatId == currentState.selectedConversationId) return
 
-                viewModelScope.launch(Dispatchers.IO) {
+                launchOnBackground {
                     setState {
                         copy(
                             selectedConversationId = event.chatId,
@@ -92,7 +89,7 @@ class MainViewModel @Inject constructor(
 
                 setState { copy(isFetching = true) }
 
-                viewModelScope.launch(Dispatchers.IO) {
+                launchOnBackground {
 
                     val actualConversationId =
                         currentState.selectedConversationId

@@ -1,7 +1,12 @@
 package com.lvs.chatgpt.base
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +32,7 @@ abstract class BaseViewModel<Event : UiEvent, State : UiState, Effect : UiEffect
     private val _event: MutableSharedFlow<Event> = MutableSharedFlow()
     val event = _event.asSharedFlow()
 
-    private val _effect : Channel<Effect> = Channel()
+    private val _effect: Channel<Effect> = Channel()
     val effect = _effect.receiveAsFlow()
 
     init {
@@ -48,12 +53,12 @@ abstract class BaseViewModel<Event : UiEvent, State : UiState, Effect : UiEffect
     /**
      * Handle each event
      */
-    abstract fun handleEvent(event : Event)
+    abstract fun handleEvent(event: Event)
 
     /**
      * Set new Event
      */
-    fun setEvent(event : Event) {
+    fun setEvent(event: Event) {
         val newEvent = event
         viewModelScope.launch { _event.emit(newEvent) }
     }
@@ -74,6 +79,15 @@ abstract class BaseViewModel<Event : UiEvent, State : UiState, Effect : UiEffect
         val effectValue = builder()
         viewModelScope.launch { _effect.send(effectValue) }
     }
+
+    protected val exceptionHandler = CoroutineExceptionHandler { context, exception ->
+        Log.e("ViewModel", exception.stackTraceToString())
+    }
+
+    protected fun launchOnBackground(
+        exceptionHandler: CoroutineExceptionHandler = this.exceptionHandler,
+        block: suspend CoroutineScope.() -> Unit,
+    ): Job = viewModelScope.launch(context = exceptionHandler + Dispatchers.IO, block = block)
 
 
 }
