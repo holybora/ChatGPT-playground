@@ -1,4 +1,4 @@
-package com.lvs.chatgpt.ui.main
+package com.lvs.chatgpt.ui.chat
 
 import android.util.Log
 import com.lvs.chatgpt.base.BaseViewModel
@@ -14,14 +14,14 @@ import javax.inject.Inject
 
 //TODO: Error handling
 @HiltViewModel
-class MainViewModel @Inject constructor(
+class ChatViewModel @Inject constructor(
     private val getConversations: GetConversationUseCase,
     private val createConversation: CreateConversationUseCase,
     private val getConversationsFlowUseCase: GetConversationsFlowUseCase,
     private val sendMessageToChatGPT: SendMessageToChatGPTUseCase,
     private val insertMessageUseCase: InsertMessageUseCase,
     private val getMessagesByConversationId: GetMessagesByConversationIdUseCase
-) : BaseViewModel<MainEvent, MainUiState, MainEffect>() {
+) : BaseViewModel<ChatEvent, ChatUiState, ChatEffect>() {
 
     init {
         launchOnBackground {
@@ -50,10 +50,10 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    override fun createInitialState(): MainUiState = MainUiState()
-    override fun handleEvent(event: MainEvent) {
+    override fun createInitialState(): ChatUiState = ChatUiState()
+    override fun handleEvent(event: ChatEvent) {
         when (event) {
-            is MainEvent.OnChatClicked -> {
+            is ChatEvent.OnChatClicked -> {
                 if (event.chatId == currentState.selectedConversationId) return
 
                 launchOnBackground {
@@ -66,7 +66,7 @@ class MainViewModel @Inject constructor(
                 }
             }
 
-            is MainEvent.OnNewChatClicked -> {
+            is ChatEvent.OnNewChatClicked -> {
                 setState {
                     copy(
                         selectedConversationId = DEFAULT_CONVERSATION_ID,
@@ -75,15 +75,8 @@ class MainViewModel @Inject constructor(
                 }
             }
 
-            is MainEvent.OnOpenDrawer -> setState {
-                copy(drawerShouldBeOpen = true)
-            }
 
-            is MainEvent.OnResetOpenDrawerAction -> setState {
-                copy(drawerShouldBeOpen = false)
-            }
-
-            is MainEvent.OnSendMessage -> {
+            is ChatEvent.OnSendMessage -> {
 
                 if (event.message.isBlank()) return
 
@@ -133,6 +126,6 @@ class MainViewModel @Inject constructor(
 
 
     companion object {
-        val TAG = MainViewModel::class.simpleName
+        val TAG = ChatViewModel::class.simpleName
     }
 }

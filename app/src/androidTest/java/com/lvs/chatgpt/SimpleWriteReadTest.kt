@@ -3,14 +3,11 @@ package com.lvs.chatgpt
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.lvs.data.remote.db.CGPTDatabase
 import com.lvs.data.remote.db.dao.MessagesDao
 import com.lvs.data.remote.db.entities.MessageEntity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -55,16 +52,14 @@ class SimpleEntityReadWriteTest {
 
         assert(messages != null) { "Messages shouldn't be a null" }
 
-        val messageInTable = messages?.first()
-
-        assert(messageInTable?.uid == messageId) {
-            "Message id unexpected. Should be $messageId but was: ${messageInTable?.uid}"
+        assert(messages?.uid == messageId) {
+            "Message id unexpected. Should be $messageId but was: ${messages?.uid}"
         }
-        assert(messageInTable?.text == textMessage) {
-            "Message text unexpected. Should be $textMessage but was: ${messageInTable?.text}"
+        assert(messages?.text == textMessage) {
+            "Message text unexpected. Should be $textMessage but was: ${messages?.text}"
         }
-        assert(messageInTable?.role == role) {
-            "Message role unexpected. Should be $role but was: ${messageInTable?.role}"
+        assert(messages?.role == role) {
+            "Message role unexpected. Should be $role but was: ${messages?.role}"
         }
 
     }

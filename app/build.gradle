@@ -42,13 +42,14 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.4.5'
+        kotlinCompilerExtensionVersion '1.4.7'
     }
     packagingOptions {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+    buildToolsVersion '33.0.2'
 }
 
 // Allow references to generated code
@@ -62,6 +63,7 @@ dependencies {
     implementation project(path: ':data')
 
     implementation libs.androidx.lifecycle.compose
+    implementation libs.androidx.lifecycle.compose.viewmodel
 
     implementation libs.androidx.activity.compose
     implementation libs.androidx.activity.ktx
@@ -71,11 +73,14 @@ dependencies {
     implementation libs.androidx.compose.ui.graphics
     implementation libs.androidx.compose.ui.tooling.preview
     implementation libs.androidx.compose.material3
+    implementation libs.androidx.compose.material3.window
     implementation libs.androidx.compose.material.icons.extended
-    //implementation libs.androidx.compose.constraintlayout
+
+    implementation libs.androidx.compose.constraintlayout
 
     implementation libs.androidx.navigation.compose
     implementation libs.io.coil
+    implementation libs.androidx.junit.ktx
 
     kapt libs.hilt.comliper
     implementation libs.hilt.android
@@ -87,6 +92,10 @@ dependencies {
     implementation libs.room.runtime
     annotationProcessor libs.room.compiler
     implementation libs.room.ktx
+
+    debugImplementation libs.androidx.ui.tooling
+    implementation libs.androidx.ui.tooling.preview.android
+
     ksp libs.room.compiler
 
     androidTestImplementation libs.kotlinx.coroutines.test

@@ -80,7 +80,7 @@ abstract class BaseViewModel<Event : UiEvent, State : UiState, Effect : UiEffect
         viewModelScope.launch { _effect.send(effectValue) }
     }
 
-    protected val exceptionHandler = CoroutineExceptionHandler { context, exception ->
+    protected val exceptionHandler = CoroutineExceptionHandler { _, exception ->
         Log.e("ViewModel", exception.stackTraceToString())
     }
 

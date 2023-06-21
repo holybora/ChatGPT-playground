@@ -1,4 +1,4 @@
-package com.lvs.chatgpt.ui.main
+package com.lvs.chatgpt.ui.chat
 
 import android.util.Log
 import androidx.compose.animation.animateContentSize
@@ -34,10 +34,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuDefaults.outlinedTextFieldColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -214,6 +215,7 @@ fun ChatMessageCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatTextInput(
     onSendMessageListener: (String) -> Unit
@@ -248,7 +250,7 @@ fun ChatTextInput(
                             .fillMaxWidth()
                             .padding(horizontal = 18.dp)
                             .weight(1f),
-                        colors = OutlinedTextFieldDefaults.colors(
+                        colors = outlinedTextFieldColors(
                             focusedBorderColor = Color.Transparent,
                             unfocusedBorderColor = Color.Transparent,
                             focusedLabelColor = Color.White,
