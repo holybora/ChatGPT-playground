@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -20,6 +21,11 @@ fun ChatScreen(
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.messages.size + uiState.isFetching.hashCode()) {
+        chatListState.animateScrollToItem(0)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()

@@ -4,9 +4,9 @@ import android.util.Log
 import com.lvs.chatgpt.base.BaseViewModel
 import com.lvs.data.remote.db.entities.ConversationEntity.Companion.DEFAULT_CONVERSATION_ID
 import com.lvs.domain.CreateConversationUseCase
-import com.lvs.domain.GetConversationUseCase
 import com.lvs.domain.GetConversationsFlowUseCase
 import com.lvs.domain.GetMessagesByConversationIdUseCase
+import com.lvs.domain.GetSelectedConversationFlowUseCase
 import com.lvs.domain.InsertMessageUseCase
 import com.lvs.domain.SendMessageToChatGPTUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,67 +15,41 @@ import javax.inject.Inject
 //TODO: Error handling
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val getConversations: GetConversationUseCase,
     private val createConversation: CreateConversationUseCase,
     private val getConversationsFlowUseCase: GetConversationsFlowUseCase,
     private val sendMessageToChatGPT: SendMessageToChatGPTUseCase,
     private val insertMessageUseCase: InsertMessageUseCase,
-    private val getMessagesByConversationId: GetMessagesByConversationIdUseCase
+    private val getMessagesByConversationId: GetMessagesByConversationIdUseCase,
+    private val getSelectedConversationFlow: GetSelectedConversationFlowUseCase
 ) : BaseViewModel<ChatEvent, ChatUiState, ChatEffect>() {
 
     init {
         launchOnBackground {
             getConversationsFlowUseCase().collect {
-                setState {
-                    copy(conversations = it)
-                }
+                setState { copy(conversations = it) }
             }
         }
-
         launchOnBackground {
-            val conversations = getConversations()
-            val selectedConversation = conversations.firstOrNull()
-            val selectedConversationId = selectedConversation?.id
-                ?: runCatching { createConversation("New Chat") }
-                    .onFailure { handleException(it) }
-                    .getOrThrow()
-
-            setState {
-                copy(
-                    conversations = conversations,
-                    selectedConversationId = selectedConversationId,
-                    messages = getMessagesByConversationId(selectedConversationId)
-                )
-            }
+            getSelectedConversationFlow()
+                .collect { conversation ->
+                    setState {
+                        if (conversation == null)
+                            copy(
+                                messages = emptyList(),
+                                selectedConversationId = DEFAULT_CONVERSATION_ID
+                            )
+                        else copy(
+                            messages = getMessagesByConversationId(conversation.id),
+                            selectedConversationId = conversation.id
+                        )
+                    }
+                }
         }
     }
 
     override fun createInitialState(): ChatUiState = ChatUiState()
     override fun handleEvent(event: ChatEvent) {
         when (event) {
-            is ChatEvent.OnChatClicked -> {
-                if (event.chatId == currentState.selectedConversationId) return
-
-                launchOnBackground {
-                    setState {
-                        copy(
-                            selectedConversationId = event.chatId,
-                            messages = getMessagesByConversationId(event.chatId)
-                        )
-                    }
-                }
-            }
-
-            is ChatEvent.OnNewChatClicked -> {
-                setState {
-                    copy(
-                        selectedConversationId = DEFAULT_CONVERSATION_ID,
-                        messages = emptyList()
-                    )
-                }
-            }
-
-
             is ChatEvent.OnSendMessage -> {
 
                 if (event.message.isBlank()) return

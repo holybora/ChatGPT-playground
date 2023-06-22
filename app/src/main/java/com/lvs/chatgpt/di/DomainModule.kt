@@ -5,11 +5,12 @@ import com.lvs.data.remote.repositories.ConversationRepository
 import com.lvs.data.remote.repositories.MessageRepository
 import com.lvs.data.remote.repositories.OpenAIRepository
 import com.lvs.domain.CreateConversationUseCase
-import com.lvs.domain.GetConversationUseCase
 import com.lvs.domain.GetConversationsFlowUseCase
 import com.lvs.domain.GetMessagesByConversationIdUseCase
+import com.lvs.domain.GetSelectedConversationFlowUseCase
 import com.lvs.domain.InsertMessageUseCase
 import com.lvs.domain.SendMessageToChatGPTUseCase
+import com.lvs.domain.SetSelectedConversationUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,10 +23,6 @@ object DomainModule {
     @Provides
     fun provideCreateConversationUseCase(conversationRepository: ConversationRepository) =
         CreateConversationUseCase(conversationRepository)
-
-    @Provides
-    fun provideGetConversationUseCase(conversationRepository: ConversationRepository) =
-        GetConversationUseCase(conversationRepository)
 
     @Provides
     fun provideSendMessageToGPTUseCase(
@@ -60,5 +57,15 @@ object DomainModule {
         messagesRepository = messagesRepository,
         messagesDataToUiConverter = messagesDataToUiConverter
     )
+
+    @Provides
+    fun provideGetSelectedConversationFlowUseCase(
+        conversationRepository: ConversationRepository
+    ) = GetSelectedConversationFlowUseCase(conversationRepository)
+
+    @Provides
+    fun provideSetSelectedConversationUseCase(
+        conversationRepository: ConversationRepository
+    ) = SetSelectedConversationUseCase(conversationRepository)
 
 }

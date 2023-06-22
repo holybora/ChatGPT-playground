@@ -9,25 +9,29 @@ import com.lvs.data.remote.repositories.MessageRepository
 import com.lvs.data.remote.repositories.MessageRepositoryImpl
 import com.lvs.data.remote.repositories.OpenAIRepository
 import com.lvs.data.remote.repositories.OpenAIRepositoryImpl
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 
 @Module
-@InstallIn(ViewModelComponent::class)
+@InstallIn(SingletonComponent::class)
 object RepositoriesModule {
 
     @Provides
+    @Singleton
     fun provideMessagesRepository(messagesDao: MessagesDao): MessageRepository = MessageRepositoryImpl(messagesDao)
 
     @Provides
-    fun provideConversationsRepository(conversationsDao: ConversationsDao): ConversationRepository =
-        ConversationRepositoryImpl(conversationsDao)
+    @Singleton
+    fun provideConversationsRepository(conversationsDao: ConversationsDao): ConversationRepository {
+        return ConversationRepositoryImpl(conversationsDao)
+    }
 
     @Provides
+    @Singleton
     fun provideOpenAiRepository(openAIApi: OpenAIApi): OpenAIRepository = OpenAIRepositoryImpl(openAIApi)
 
 }

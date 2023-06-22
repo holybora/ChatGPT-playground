@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.Flow
 
 
 interface ConversationRepository {
+    fun setSelectedConversation(conversationEntity: ConversationEntity?)
+    fun getSelectedConversation(): Flow<ConversationEntity?>
     fun getConversationsFlow(): Flow<List<ConversationEntity>>
     fun getConversations(): List<ConversationEntity>
     fun getConversationById(conversationId: Long): ConversationEntity?

@@ -11,20 +11,20 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.lvs.chatgpt.ui.chat.ChatEvent
-import com.lvs.chatgpt.ui.chat.ChatViewModel
 import com.lvs.chatgpt.ui.components.AppDrawer
+import com.lvs.chatgpt.ui.home.HomeEvent
+import com.lvs.chatgpt.ui.home.HomeViewModel
 import com.lvs.chatgpt.ui.theme.ChatGPTTheme
+import com.lvs.data.remote.db.entities.ConversationEntity.Companion.DEFAULT_CONVERSATION_ID
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,7 +35,8 @@ fun CGPTApp(widthSizeClass: WindowWidthSizeClass) {
         mutableStateOf(true)
     }
     ChatGPTTheme(darkTheme.value) {
-        val viewModel: ChatViewModel = viewModel()
+
+        val viewModel = hiltViewModel<HomeViewModel>()
 
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -56,10 +57,6 @@ fun CGPTApp(widthSizeClass: WindowWidthSizeClass) {
 
         val chatListState = rememberLazyListState()
 
-        LaunchedEffect(uiState.messages.size + uiState.isFetching.hashCode()) {
-            chatListState.animateScrollToItem(0)
-        }
-
         ModalNavigationDrawer(
             drawerState = sizeAwareDrawerState,
             drawerContent = {
@@ -68,20 +65,20 @@ fun CGPTApp(widthSizeClass: WindowWidthSizeClass) {
                         currentRoute = currentRoute,
                         onChatClicked = {
                             coroutineScope.launch {
-                                viewModel.setEvent(ChatEvent.OnChatClicked(it))
+                                viewModel.setEvent(HomeEvent.OnChatClicked(it))
                                 sizeAwareDrawerState.close()
                             }
                         },
                         onNewChatClicked = {
                             coroutineScope.launch {
-                                viewModel.setEvent(ChatEvent.OnNewChatClicked)
+                                viewModel.setEvent(HomeEvent.OnNewChatClicked)
                                 sizeAwareDrawerState.close()
                             }
                         },
                         closeDrawer = { coroutineScope.launch { sizeAwareDrawerState.close() } },
                         navigateToHome = navigationActions.navigateToHome,
                         onIconClicked = { darkTheme.value = !darkTheme.value },
-                        selectedConversation = uiState.selectedConversationId,
+                        selectedConversation = uiState.selectedConversation?.id ?: DEFAULT_CONVERSATION_ID,
                         conversations = uiState.conversations
                     )
                 }
