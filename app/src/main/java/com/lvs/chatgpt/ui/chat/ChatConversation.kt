@@ -1,6 +1,5 @@
 package com.lvs.chatgpt.ui.chat
 
-import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -154,8 +153,6 @@ fun ChatMessageCard(
             }
         }
     } else source.value = text
-
-    Log.i("Animated", "recompose with string $: $source")
 
     Box(
         modifier = Modifier

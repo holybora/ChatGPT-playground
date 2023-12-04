@@ -1,6 +1,5 @@
 package com.lvs.chatgpt.ui.chat
 
-import android.util.Log
 import com.lvs.chatgpt.base.BaseViewModel
 import com.lvs.data.remote.db.entities.ConversationEntity.Companion.DEFAULT_CONVERSATION_ID
 import com.lvs.domain.CreateConversationUseCase
@@ -47,11 +46,15 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    override val tag: String
+        get() = ChatViewModel::class.java.name
+
     override fun createInitialState(): ChatUiState = ChatUiState()
     override fun handleEvent(event: ChatEvent) {
         when (event) {
             is ChatEvent.OnSendMessage -> {
 
+                //TODO: feedback to user
                 if (event.message.isBlank()) return
 
                 setState { copy(isFetching = true) }
@@ -62,7 +65,7 @@ class ChatViewModel @Inject constructor(
                         currentState.selectedConversationId
                             .takeIf { currentState.selectedConversationId != DEFAULT_CONVERSATION_ID }
                             ?: runCatching { createConversation(event.message) }
-                                .onFailure { handleException(it) }
+                                .onFailure { setState { copy(isFetching = false) } }
                                 .getOrThrow()
 
 
@@ -75,12 +78,16 @@ class ChatViewModel @Inject constructor(
 
                     setState { copy(messages = listOf(insertedMessage) + messages) }
 
-                    val actualMessages = sendMessageToChatGPT(
-                        SendMessageToChatGPTUseCase.Params(
-                            messagesForContext = currentState.messages.take(3),
-                            conversationId = actualConversationId
+                    val actualMessages = runCatching {
+                        sendMessageToChatGPT(
+                            SendMessageToChatGPTUseCase.Params(
+                                messagesForContext = currentState.messages.take(3),
+                                conversationId = actualConversationId
+                            )
                         )
-                    )
+                    }
+                        .onFailure { setState { copy(isFetching = false) } }
+                        .getOrThrow()
 
                     setState {
                         copy(
@@ -94,12 +101,4 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun handleException(exception: Throwable) {
-        Log.e(TAG, exception.toString())
-    }
-
-
-    companion object {
-        val TAG = ChatViewModel::class.simpleName
-    }
 }

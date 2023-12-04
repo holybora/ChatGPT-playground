@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 
 abstract class BaseViewModel<Event : UiEvent, State : UiState, Effect : UiEffect> : ViewModel() {
 
+    protected abstract val tag: String
 
     // Create Initial State of View
     private val initialState: State by lazy { createInitialState() }
@@ -80,8 +81,8 @@ abstract class BaseViewModel<Event : UiEvent, State : UiState, Effect : UiEffect
         viewModelScope.launch { _effect.send(effectValue) }
     }
 
-    protected val exceptionHandler = CoroutineExceptionHandler { _, exception ->
-        Log.e("ViewModel", exception.stackTraceToString())
+    open protected val exceptionHandler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, exception ->
+        Log.e(tag, exception.stackTraceToString())
     }
 
     protected fun launchOnBackground(

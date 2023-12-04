@@ -30,6 +30,9 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    override val tag: String
+        get() = HomeViewModel::class.java.name
+
     override fun createInitialState(): HomeUiState = HomeUiState()
 
     override fun handleEvent(event: HomeEvent) {

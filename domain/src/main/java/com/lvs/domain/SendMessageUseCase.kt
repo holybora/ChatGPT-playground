@@ -4,12 +4,10 @@ import com.lvs.data.converters.MessagesDataToUiConverter
 import com.lvs.data.local.main.MessageUiEntity
 import com.lvs.data.remote.api.enities.MessageDto
 import com.lvs.data.remote.common.GPTModel
-import com.lvs.data.remote.common.GPTRole
 import com.lvs.data.remote.db.entities.MessageEntity
 import com.lvs.data.remote.repositories.ConversationRepository
 import com.lvs.data.remote.repositories.MessageRepository
 import com.lvs.data.remote.repositories.OpenAIRepository
-import java.lang.IllegalStateException
 import javax.inject.Inject
 
 class SendMessageToChatGPTUseCase @Inject constructor(
@@ -41,7 +39,8 @@ class SendMessageToChatGPTUseCase @Inject constructor(
                             content = it.text
                         )
                     })
-        //TODO: think how better choose response message
+
+        //TODO: think how choose response message better
         val responseMessage = response.choices.first().message
 
         messagesRepository.insertMessage(
