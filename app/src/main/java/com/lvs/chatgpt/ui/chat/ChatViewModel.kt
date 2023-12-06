@@ -23,6 +23,7 @@ class ChatViewModel @Inject constructor(
 ) : BaseViewModel<ChatEvent, ChatUiState, ChatEffect>() {
 
     init {
+        // as collect{} is infinity suspend function from Room we should call it in standalone coroutine builder
         launchOnBackground {
             getConversationsFlowUseCase().collect {
                 setState { copy(conversations = it) }

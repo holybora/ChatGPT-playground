@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -89,6 +91,11 @@ abstract class BaseViewModel<Event : UiEvent, State : UiState, Effect : UiEffect
         exceptionHandler: CoroutineExceptionHandler = this.exceptionHandler,
         block: suspend CoroutineScope.() -> Unit,
     ): Job = viewModelScope.launch(context = exceptionHandler + Dispatchers.IO, block = block)
+
+    protected fun asyncOnBackground(
+        exceptionHandler: CoroutineExceptionHandler = this.exceptionHandler,
+        block: suspend CoroutineScope.() -> Unit
+    ): Deferred<Unit> = viewModelScope.async(context = exceptionHandler + Dispatchers.IO, block = block)
 
 
 }

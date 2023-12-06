@@ -1,4 +1,4 @@
-package com.lvs.chatgpt.ui.components
+    package com.lvs.chatgpt.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
