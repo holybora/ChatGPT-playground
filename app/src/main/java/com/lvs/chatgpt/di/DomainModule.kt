@@ -5,6 +5,7 @@ import com.lvs.data.remote.repositories.ConversationRepository
 import com.lvs.data.remote.repositories.MessageRepository
 import com.lvs.data.remote.repositories.OpenAIRepository
 import com.lvs.domain.CreateConversationUseCase
+import com.lvs.domain.DeleteConversationUseCase
 import com.lvs.domain.GetConversationsFlowUseCase
 import com.lvs.domain.GetMessagesByConversationIdUseCase
 import com.lvs.domain.GetSelectedConversationFlowUseCase
@@ -67,5 +68,10 @@ object DomainModule {
     fun provideSetSelectedConversationUseCase(
         conversationRepository: ConversationRepository
     ) = SetSelectedConversationUseCase(conversationRepository)
+
+    @Provides
+    fun provideDeleteConversationUseCase(
+        conversationRepository: ConversationRepository
+    ) = DeleteConversationUseCase(conversationRepository)
 
 }

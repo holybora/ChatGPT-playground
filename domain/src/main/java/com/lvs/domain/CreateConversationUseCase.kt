@@ -5,7 +5,9 @@ import javax.inject.Inject
 
 class CreateConversationUseCase @Inject constructor(private val repository: ConversationRepository) {
     operator fun invoke(params: String): Long {
-        return repository.newConversation(params)
+        val convId = repository.newConversation(params)
+        repository.setSelectedConversation(repository.getConversationById(convId))
+        return convId
     }
 
 

@@ -19,6 +19,7 @@ fun CGPTNavGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     openDrawer: () -> Unit = {},
+    onDeleteChat: () -> Unit = {},
     startDestination: String = CHATS_ROUTE,
     chatListState: LazyListState
 
@@ -34,6 +35,7 @@ fun CGPTNavGraph(
             ChatScreen(
                 viewModel = viewModel,
                 onDrawerClick = openDrawer,
+                onDeleteChatClick = onDeleteChat,
                 chatListState = chatListState
             )
         }

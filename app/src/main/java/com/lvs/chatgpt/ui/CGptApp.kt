@@ -87,6 +87,13 @@ fun CGPTApp(widthSizeClass: WindowWidthSizeClass) {
                 CGPTNavGraph(
                     navController = navController,
                     openDrawer = { coroutineScope.launch { sizeAwareDrawerState.open() } },
+                    onDeleteChat = {
+                        viewModel.handleEvent(
+                            HomeEvent.OnDeleteChatClicked(
+                                uiState.selectedConversation?.id ?: DEFAULT_CONVERSATION_ID
+                            )
+                        )
+                    },
                     chatListState = chatListState
                 )
             }

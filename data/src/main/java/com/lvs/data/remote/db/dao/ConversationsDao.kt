@@ -5,7 +5,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
 import androidx.room.Upsert
 import com.lvs.data.remote.db.entities.ConversationEntity
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +25,7 @@ interface ConversationsDao {
     @Query("SELECT * FROM conversations")
     fun getAllFlow(): Flow<List<ConversationEntity>>
 
-    @Query("SELECT * FROM conversations")
+    @Query("SELECT * FROM conversations ORDER BY created_at DESC")
     fun getAll(): List<ConversationEntity>
 
     @Query("SELECT * FROM conversations ORDER BY created_at DESC")

@@ -17,6 +17,7 @@ import com.lvs.chatgpt.ui.components.AppBar
 fun ChatScreen(
     viewModel: ChatViewModel,
     onDrawerClick: () -> Unit,
+    onDeleteChatClick: () -> Unit,
     chatListState: LazyListState,
 ) {
 
@@ -31,7 +32,10 @@ fun ChatScreen(
             .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.background)
     ) {
-        AppBar(onClickMenu = { onDrawerClick.invoke() })
+        AppBar(
+            onClickMenu = { onDrawerClick.invoke() },
+            onDeleteClick = { onDeleteChatClick.invoke() }
+        )
         Divider()
 
         ChatConversation(
