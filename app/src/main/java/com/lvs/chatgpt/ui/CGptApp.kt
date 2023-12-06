@@ -24,7 +24,6 @@ import com.lvs.chatgpt.ui.components.AppDrawer
 import com.lvs.chatgpt.ui.home.HomeEvent
 import com.lvs.chatgpt.ui.home.HomeViewModel
 import com.lvs.chatgpt.ui.theme.ChatGPTTheme
-import com.lvs.data.remote.db.entities.ConversationEntity.Companion.DEFAULT_CONVERSATION_ID
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,7 +77,7 @@ fun CGPTApp(widthSizeClass: WindowWidthSizeClass) {
                         closeDrawer = { coroutineScope.launch { sizeAwareDrawerState.close() } },
                         navigateToHome = navigationActions.navigateToHome,
                         onIconClicked = { darkTheme.value = !darkTheme.value },
-                        selectedConversation = uiState.selectedConversation?.id ?: DEFAULT_CONVERSATION_ID,
+                        selectedConversation = uiState.selectedConversation,
                         conversations = uiState.conversations
                     )
                 }
@@ -88,11 +87,7 @@ fun CGPTApp(widthSizeClass: WindowWidthSizeClass) {
                     navController = navController,
                     openDrawer = { coroutineScope.launch { sizeAwareDrawerState.open() } },
                     onDeleteChat = {
-                        viewModel.handleEvent(
-                            HomeEvent.OnDeleteChatClicked(
-                                uiState.selectedConversation?.id ?: DEFAULT_CONVERSATION_ID
-                            )
-                        )
+                        viewModel.setEvent(HomeEvent.OnDeleteChatClicked(uiState.selectedConversation))
                     },
                     chatListState = chatListState
                 )

@@ -1,7 +1,6 @@
 package com.lvs.chatgpt.ui.chat
 
 import com.lvs.chatgpt.base.BaseViewModel
-import com.lvs.data.remote.db.entities.ConversationEntity.Companion.DEFAULT_CONVERSATION_ID
 import com.lvs.domain.CreateConversationUseCase
 import com.lvs.domain.GetConversationsFlowUseCase
 import com.lvs.domain.GetMessagesByConversationIdUseCase
@@ -9,6 +8,8 @@ import com.lvs.domain.GetSelectedConversationFlowUseCase
 import com.lvs.domain.InsertMessageUseCase
 import com.lvs.domain.SendMessageToChatGPTUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import javax.inject.Inject
 
 //TODO: Error handling
@@ -22,6 +23,8 @@ class ChatViewModel @Inject constructor(
     private val getSelectedConversationFlow: GetSelectedConversationFlowUseCase
 ) : BaseViewModel<ChatEvent, ChatUiState, ChatEffect>() {
 
+    private var onSendMessageJob: Job? = null
+
     init {
         // as collect{} is infinity suspend function from Room we should call it in standalone coroutine builder
         launchOnBackground {
@@ -33,14 +36,17 @@ class ChatViewModel @Inject constructor(
             getSelectedConversationFlow()
                 .collect { conversation ->
                     setState {
+                        if (onSendMessageJob?.isActive == true) onSendMessageJob?.cancel()
                         if (conversation == null)
                             copy(
                                 messages = emptyList(),
-                                selectedConversationId = DEFAULT_CONVERSATION_ID
+                                selectedConversation = null,
+                                isFetching = false
                             )
                         else copy(
                             messages = getMessagesByConversationId(conversation.id),
-                            selectedConversationId = conversation.id
+                            selectedConversation = conversation,
+                            isFetching = false
                         )
                     }
                 }
@@ -60,46 +66,54 @@ class ChatViewModel @Inject constructor(
 
                 setState { copy(isFetching = true) }
 
-                launchOnBackground {
+                onSendMessageJob = launchOnBackground {
 
-                    val actualConversationId =
-                        currentState.selectedConversationId
-                            .takeIf { currentState.selectedConversationId != DEFAULT_CONVERSATION_ID }
+                    val actualConversation =
+                        currentState.selectedConversation
                             ?: runCatching { createConversation(event.message) }
                                 .onFailure { setState { copy(isFetching = false) } }
                                 .getOrThrow()
 
+                    if (onSendMessageJob?.isCancelled == true) throw CancellationException()
 
                     val insertedMessage = insertMessageUseCase(
                         InsertMessageUseCase.Params(
                             textToSend = event.message,
-                            conversationId = actualConversationId
+                            conversationId = actualConversation.id
                         )
                     )
 
                     setState { copy(messages = listOf(insertedMessage) + messages) }
 
+                    if (onSendMessageJob?.isCancelled == true) throw CancellationException()
+
                     val actualMessages = runCatching {
                         sendMessageToChatGPT(
                             SendMessageToChatGPTUseCase.Params(
                                 messagesForContext = currentState.messages.take(3),
-                                conversationId = actualConversationId
+                                conversationId = actualConversation.id
                             )
                         )
                     }
                         .onFailure { setState { copy(isFetching = false) } }
                         .getOrThrow()
 
+                    if (onSendMessageJob?.isCancelled == true) throw CancellationException()
+
                     setState {
                         copy(
                             isFetching = false,
                             messages = actualMessages,
-                            selectedConversationId = actualConversationId
+                            selectedConversation = actualConversation
                         )
                     }
                 }
             }
         }
+    }
+
+    override fun onCleared() {
+        if (onSendMessageJob?.isActive == true) onSendMessageJob?.cancel()
     }
 
 }

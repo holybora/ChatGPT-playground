@@ -107,7 +107,9 @@ fun ColumnScope.ChatMessageList(
                     )
                 }
             }
-            items(messages.size, key = { messages[it].uid }) { index ->
+            items(messages.size, key = {
+                messages[it].run { uid + conversationId.hashCode() }
+            }) { index ->
                 val message = messages[index]
                 val isUser = message.role == GPTRole.USER
                 Box(

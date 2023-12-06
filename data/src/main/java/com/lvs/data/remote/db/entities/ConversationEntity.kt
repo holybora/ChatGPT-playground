@@ -14,11 +14,6 @@ data class ConversationEntity(
 ) {
     data class InsertionPrototype(val title: String)
 
-    companion object {
-        const val DEFAULT_CONVERSATION_ID = -1L
-
-    }
-
     data class UpdateTitle(
         val id: Long,
         val title: String,

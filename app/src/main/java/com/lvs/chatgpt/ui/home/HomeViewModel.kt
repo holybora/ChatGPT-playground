@@ -1,12 +1,10 @@
 package com.lvs.chatgpt.ui.home
 
-import android.util.Log
 import com.lvs.chatgpt.base.BaseViewModel
 import com.lvs.chatgpt.base.UiEffect
 import com.lvs.chatgpt.base.UiEvent
 import com.lvs.chatgpt.base.UiState
 import com.lvs.data.remote.db.entities.ConversationEntity
-import com.lvs.data.remote.db.entities.ConversationEntity.Companion.DEFAULT_CONVERSATION_ID
 import com.lvs.domain.DeleteConversationUseCase
 import com.lvs.domain.GetConversationsFlowUseCase
 import com.lvs.domain.GetSelectedConversationFlowUseCase
@@ -33,7 +31,7 @@ class HomeViewModel @Inject constructor(
                 .collect { setState { copy(conversations = it) } }
         }
         launchOnBackground {
-            setSelectedConversation(getConversationsFlow().first().firstOrNull()?.id ?: DEFAULT_CONVERSATION_ID)
+            setSelectedConversation(getConversationsFlow().first().firstOrNull())
         }
     }
 
@@ -45,50 +43,50 @@ class HomeViewModel @Inject constructor(
     override fun handleEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.OnChatClicked -> {
-                if (event.chatId == currentState.selectedConversation?.id) return
+                if (event.conversation?.id == currentState.selectedConversation?.id) return
                 launchOnBackground {
-                    setSelectedConversation(event.chatId)
+                    setSelectedConversation(event.conversation)
                 }
             }
 
             HomeEvent.OnNewChatClicked -> {
                 launchOnBackground {
-                    setSelectedConversation(DEFAULT_CONVERSATION_ID)
+                    setSelectedConversation(null)
                 }
             }
 
             is HomeEvent.OnDeleteChatClicked -> {
-
                 launchOnBackground {
-
-                    val conversations = uiState.value.conversations
-                    val index = uiState.value.conversations.indexOfFirst { it.id == event.conversationId }
-                    val nextInTurnConversationId = when {
-                        //deleted single conv, set to default
-                        conversations.isEmpty() || conversations.size == 1 -> {
-                            DEFAULT_CONVERSATION_ID
-                        }
-                        //deleted last, fetch previous
-                        conversations.lastIndex == index -> {
-                            conversations.lastIndex - 1
-                        }
-                        //fetch next in turn
-                        else -> index + 1
-                    }
-                    //delete from db
-                    runCatching { deleteConversationUseCase(event.conversationId) }
-                        .onFailure {
-                            when (it) {
-                                is DeleteConversationUseCase.ConversationNonExistException -> {
-                                    //TODO: show personal message to user about error
+                    val conversation = event.conversation
+                    if (conversation == null) return@launchOnBackground
+                    else {
+                        //delete from db
+                        runCatching { deleteConversationUseCase(conversation.id) }
+                            .onFailure {
+                                when (it) {
+                                    is DeleteConversationUseCase.ConversationNonExistException -> {
+                                        //TODO: show personal message to user about error
+                                    }
                                 }
                             }
+                            .getOrThrow()
+
+                        val conversations = uiState.value.conversations
+                        val index = uiState.value.conversations.indexOfFirst { it.id == event.conversation.id }
+                        when {
+                            //deleted single conv, set to default
+                            conversations.isEmpty() || conversations.size == 1 -> {
+                                setSelectedConversation(null)
+                            }
+                            //deleted last, fetch previous
+                            conversations.lastIndex == index -> {
+                                setSelectedConversation(conversations[conversations.lastIndex - 1])
+                            }
+                            //fetch next in turn
+                            else -> setSelectedConversation(conversations[index + 1])
                         }
-                        .getOrThrow()
 
-                    Log.d(tag, "Next in turn id: $nextInTurnConversationId")
-                    setSelectedConversation(conversations[nextInTurnConversationId.toInt()].id)
-
+                    }
                 }
             }
         }
@@ -102,9 +100,9 @@ data class HomeUiState(
 ) : UiState
 
 sealed interface HomeEvent : UiEvent {
-    class OnChatClicked(val chatId: Long) : HomeEvent
+    class OnChatClicked(val conversation: ConversationEntity?) : HomeEvent
     object OnNewChatClicked : HomeEvent
-    class OnDeleteChatClicked(val conversationId: Long) : HomeEvent
+    class OnDeleteChatClicked(val conversation: ConversationEntity?) : HomeEvent
 }
 
 sealed interface HomeEffect : UiEffect

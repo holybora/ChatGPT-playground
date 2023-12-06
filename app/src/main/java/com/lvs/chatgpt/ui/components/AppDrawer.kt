@@ -46,9 +46,9 @@ import com.lvs.data.remote.db.entities.ConversationEntity
 @Composable
 fun AppDrawer(
     currentRoute: String,
-    selectedConversation: Long,
+    selectedConversation: ConversationEntity?,
     conversations: List<ConversationEntity>,
-    onChatClicked: (Long) -> Unit,
+    onChatClicked: (ConversationEntity?) -> Unit,
     navigateToHome: () -> Unit,
     closeDrawer: () -> Unit,
     onNewChatClicked: () -> Unit,
@@ -142,7 +142,9 @@ private fun DrawerHeader(
 
 @Composable
 private fun ColumnScope.HistoryConversations(
-    onChatClicked: (Long) -> Unit, conversations: List<ConversationEntity>, selectedConversation: Long
+    onChatClicked: (ConversationEntity?) -> Unit,
+    conversations: List<ConversationEntity>,
+    selectedConversation: ConversationEntity?
 ) {
     LazyColumn(
         Modifier
@@ -152,8 +154,10 @@ private fun ColumnScope.HistoryConversations(
         items(conversations.size) { index ->
             NavigationDrawerItem(
                 label = { Text(text = conversations[index].title) },
-                selected = conversations[index].id == selectedConversation,
-                onClick = { onChatClicked(conversations[index].id) },
+                selected = selectedConversation
+                    ?.run { conversations[index].id == id }
+                    ?: false,
+                onClick = { onChatClicked(conversations[index]) },
                 icon = { Icon(Icons.Filled.Message, null) },
                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
             )
@@ -192,11 +196,11 @@ fun PreviewAppDrawer() {
             onNewChatClicked = { },
             onIconClicked = { },
             closeDrawer = { },
-            selectedConversation = 1,
+            selectedConversation = ConversationEntity(0, "New Chat", ""),
             navigateToHome = { },
             conversations = listOf(
                 ConversationEntity(
-                    ConversationEntity.DEFAULT_CONVERSATION_ID, "New Chat", ""
+                    0, "New Chat", ""
                 ),
                 ConversationEntity(
                     1, "Some title", ""
