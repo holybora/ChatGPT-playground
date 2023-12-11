@@ -1,5 +1,6 @@
 package com.lvs.chatgpt.di
 
+import android.content.Context
 import com.lvs.data.converters.MessagesDataToUiConverter
 import com.lvs.data.repositories.ConversationRepository
 import com.lvs.data.repositories.MessageRepository
@@ -7,6 +8,7 @@ import com.lvs.data.repositories.OpenAIRepository
 import com.lvs.domain.CreateConversationUseCase
 import com.lvs.domain.DeleteConversationUseCase
 import com.lvs.domain.GetConversationsFlowUseCase
+import com.lvs.domain.GetFilePathFromUriUseCase
 import com.lvs.domain.GetMessagesByConversationIdUseCase
 import com.lvs.domain.InsertMessageUseCase
 import com.lvs.domain.SendMessageToChatGPTUseCase
@@ -14,6 +16,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -61,5 +64,9 @@ object DomainModule {
     fun provideDeleteConversationUseCase(
         conversationRepository: ConversationRepository
     ) = DeleteConversationUseCase(conversationRepository)
+
+    @Provides
+    fun provideGetFilePathFromUriUseCase(@ApplicationContext context: Context) =
+        GetFilePathFromUriUseCase(context)
 
 }
