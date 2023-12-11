@@ -9,15 +9,13 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-abstract class BaseViewModel<Event : UiEvent, State : UiState, Effect : UiEffect> : ViewModel() {
+abstract class BaseViewModel<Event : UiEvent, State : UiState> : ViewModel() {
 
     protected abstract val tag: String
 
@@ -34,9 +32,6 @@ abstract class BaseViewModel<Event : UiEvent, State : UiState, Effect : UiEffect
 
     private val _event: MutableSharedFlow<Event> = MutableSharedFlow()
     val event = _event.asSharedFlow()
-
-    private val _effect: Channel<Effect> = Channel()
-    val effect = _effect.receiveAsFlow()
 
     init {
         subscribeEvents()
@@ -73,14 +68,6 @@ abstract class BaseViewModel<Event : UiEvent, State : UiState, Effect : UiEffect
     protected fun setState(reduce: State.() -> State) {
         val newState = currentState.reduce()
         _uiState.value = newState
-    }
-
-    /**
-     * Set new Effect
-     */
-    protected fun setEffect(builder: () -> Effect) {
-        val effectValue = builder()
-        viewModelScope.launch { _effect.send(effectValue) }
     }
 
     open protected val exceptionHandler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, exception ->

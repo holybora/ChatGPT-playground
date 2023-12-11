@@ -8,5 +8,5 @@ data class ChatUiState(
     val isFetching: Boolean = false,
     val conversations: List<ConversationEntity> = emptyList(),
     val selectedConversation: ConversationEntity? = null,
-    val messages: List<MessageUiEntity> = emptyList()
+    val messages: List<MessageUiEntity> = emptyList(),
 ) : UiState

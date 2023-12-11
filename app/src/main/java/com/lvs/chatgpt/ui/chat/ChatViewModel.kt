@@ -1,10 +1,11 @@
 package com.lvs.chatgpt.ui.chat
 
+import androidx.lifecycle.SavedStateHandle
 import com.lvs.chatgpt.base.BaseViewModel
+import com.lvs.chatgpt.ui.chat.navigation.ChatArgs
 import com.lvs.domain.CreateConversationUseCase
 import com.lvs.domain.GetConversationsFlowUseCase
 import com.lvs.domain.GetMessagesByConversationIdUseCase
-import com.lvs.domain.GetSelectedConversationFlowUseCase
 import com.lvs.domain.InsertMessageUseCase
 import com.lvs.domain.SendMessageToChatGPTUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,41 +16,59 @@ import javax.inject.Inject
 //TODO: Error handling
 @HiltViewModel
 class ChatViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val createConversation: CreateConversationUseCase,
     private val getConversationsFlowUseCase: GetConversationsFlowUseCase,
     private val sendMessageToChatGPT: SendMessageToChatGPTUseCase,
     private val insertMessageUseCase: InsertMessageUseCase,
     private val getMessagesByConversationId: GetMessagesByConversationIdUseCase,
-    private val getSelectedConversationFlow: GetSelectedConversationFlowUseCase
-) : BaseViewModel<ChatEvent, ChatUiState, ChatEffect>() {
+) : BaseViewModel<ChatEvent, ChatUiState>() {
 
     private var onSendMessageJob: Job? = null
+    private val chatArgs: ChatArgs = ChatArgs(savedStateHandle)
 
     init {
         // as collect{} is infinity suspend function from Room we should call it in standalone coroutine builder
         launchOnBackground {
             getConversationsFlowUseCase().collect {
-                setState { copy(conversations = it) }
-            }
-        }
-        launchOnBackground {
-            getSelectedConversationFlow()
-                .collect { conversation ->
+                val convId: Long = checkNotNull(chatArgs.conversationId)
+                val conversation = checkNotNull(it.find { it.id == convId })
+                if (chatArgs.isNew) {
                     setState {
-                        if (onSendMessageJob?.isActive == true) onSendMessageJob?.cancel()
-                        if (conversation == null)
-                            copy(
-                                messages = emptyList(),
-                                selectedConversation = null,
-                                isFetching = false
+                        copy(
+                            isFetching = true,
+                            messages = getMessagesByConversationId(conversation.id)
+                        )
+                    }
+
+                    val actualMessages = runCatching {
+                        sendMessageToChatGPT(
+                            SendMessageToChatGPTUseCase.Params(
+                                messagesForContext = currentState.messages.take(1),
+                                conversationId = convId
                             )
-                        else copy(
+                        )
+                    }
+                        .onFailure { setState { copy(isFetching = false) } }
+                        .getOrThrow()
+
+                    setState {
+                        copy(
+                            isFetching = false,
+                            messages = actualMessages,
+                            selectedConversation = conversation
+                        )
+                    }
+                } else {
+                    setState {
+                        copy(
                             messages = getMessagesByConversationId(conversation.id),
                             selectedConversation = conversation,
-                            isFetching = false
+                            isFetching = false,
                         )
                     }
                 }
+            }
         }
     }
 

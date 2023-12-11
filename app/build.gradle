@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     alias libs.plugins.android.application
     alias libs.plugins.android.kotlin
@@ -8,12 +10,11 @@ plugins {
 
 android {
     namespace 'com.lvs.chatgpt'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.lvs.chatgpt"
         minSdk 29
-        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -23,6 +24,7 @@ android {
         }
 
         buildConfigField("String", "APP_KEY", API_KEY)
+        android.buildFeatures.buildConfig true
     }
 
     buildTypes {
@@ -32,11 +34,13 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        tasks.withType(KotlinCompile).configureEach {
+            kotlinOptions.jvmTarget = "17"
+        }
     }
     buildFeatures {
         compose true
@@ -49,7 +53,6 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
-    buildToolsVersion '33.0.2'
 }
 
 // Allow references to generated code

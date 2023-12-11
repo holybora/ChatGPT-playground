@@ -1,12 +1,10 @@
-package com.lvs.data.remote.repositories
+package com.lvs.data.repositories
 
 import com.lvs.data.remote.db.entities.ConversationEntity
 import kotlinx.coroutines.flow.Flow
 
 
 interface ConversationRepository {
-    fun setSelectedConversation(conversationEntity: ConversationEntity?)
-    fun getSelectedConversation(): Flow<ConversationEntity?>
     fun getConversationsFlow(): Flow<List<ConversationEntity>>
     fun getConversations(): List<ConversationEntity>
     fun getConversationById(conversationId: Long): ConversationEntity?

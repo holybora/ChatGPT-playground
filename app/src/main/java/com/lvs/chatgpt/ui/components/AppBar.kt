@@ -35,7 +35,8 @@ import com.lvs.chatgpt.constant.urlToAvatarGPT
 @Composable
 fun AppBar(
     onClickMenu: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    isDeleteAvailable: Boolean
 ) {
     Surface(
         shadowElevation = 4.dp,
@@ -80,10 +81,8 @@ fun AppBar(
                 }
             },
             actions = {
-                IconButton(
-                    onClick = {
-                        onDeleteClick()
-                    },
+                if (isDeleteAvailable) IconButton(
+                    onClick = { onDeleteClick() },
                 ) {
                     Icon(
                         Icons.Filled.DeleteForever,

@@ -18,6 +18,10 @@ data class ConversationEntity(
         val id: Long,
         val title: String,
     )
+
+    companion object {
+        val NEW_EMPTY_CONVERSATION_ID = -1L
+    }
 }
 
 fun ConversationEntity.toUpdateTitle(newTitle: String) = ConversationEntity.UpdateTitle(this.id, title = newTitle)

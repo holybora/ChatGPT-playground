@@ -2,14 +2,9 @@ package com.lvs.domain
 
 import com.lvs.data.converters.MessagesDataToUiConverter
 import com.lvs.data.local.main.MessageUiEntity
-import com.lvs.data.remote.api.enities.MessageDto
-import com.lvs.data.remote.common.GPTModel
 import com.lvs.data.remote.common.GPTRole
 import com.lvs.data.remote.db.entities.MessageEntity
-import com.lvs.data.remote.repositories.ConversationRepository
-import com.lvs.data.remote.repositories.MessageRepository
-import com.lvs.data.remote.repositories.OpenAIRepository
-import java.lang.IllegalStateException
+import com.lvs.data.repositories.MessageRepository
 import javax.inject.Inject
 
 class InsertMessageUseCase @Inject constructor(

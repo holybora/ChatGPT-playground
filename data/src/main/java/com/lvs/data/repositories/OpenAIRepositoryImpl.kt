@@ -1,4 +1,4 @@
-package com.lvs.data.remote.repositories
+package com.lvs.data.repositories
 
 import android.util.Log
 import com.lvs.data.remote.api.OpenAIApi
@@ -6,8 +6,6 @@ import com.lvs.data.remote.api.enities.ChatCompletionRequestBody
 import com.lvs.data.remote.api.enities.ChatCompletionResponseBody
 import com.lvs.data.remote.api.enities.MessageDto
 import com.lvs.data.remote.common.GPTModel
-import java.io.IOException
-import java.lang.IllegalStateException
 import javax.inject.Inject
 
 

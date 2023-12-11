@@ -1,6 +1,6 @@
-package com.lvs.chatgpt.ui
+package com.lvs.chatgpt.ui.main
 
-import androidx.compose.foundation.lazy.rememberLazyListState
+import android.util.Log
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -9,26 +9,30 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import com.lvs.chatgpt.ui.chat.navigation.navigateToChat
 import com.lvs.chatgpt.ui.components.AppDrawer
-import com.lvs.chatgpt.ui.home.HomeEvent
-import com.lvs.chatgpt.ui.home.HomeViewModel
+import com.lvs.chatgpt.ui.newchat.navigation.navigateToNewChat
+import com.lvs.chatgpt.ui.stt.navigation.navigateToTranscription
 import com.lvs.chatgpt.ui.theme.ChatGPTTheme
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+private const val TAG = "ChatGPTApp"
+
 @Composable
-fun CGPTApp(widthSizeClass: WindowWidthSizeClass) {
+fun ChatGPTApp(
+    windowSizeClass: WindowSizeClass,
+    appState: CGPTAppState = rememberCGPTAppState(windowSizeClass = windowSizeClass)
+) {
 
     val darkTheme = remember(key1 = "darkTheme") {
         mutableStateOf(true)
@@ -39,60 +43,54 @@ fun CGPTApp(widthSizeClass: WindowWidthSizeClass) {
 
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        val navController = rememberNavController()
+        val sizeAwareDrawerState =
+            rememberSizeAwareDrawerState(appState.windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded)
 
-        val navigationActions = remember(navController) {
-            CGPTNavigationActions(navController)
+        LaunchedEffect(key1 = uiState.openConversation) {
+            Log.d(TAG, "openConversation SideEfeect")
+            val convId = uiState.openConversation?.conversationId
+            val isNew = uiState.openConversation?.isNew ?: false
+            when (convId) {
+                null -> appState.navController.navigateToNewChat()
+                else -> appState.navController.navigateToChat(conversationId = convId, isNew = isNew)
+            }
         }
-
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute =
-            navBackStackEntry?.destination?.route ?: CGPTDestinations.CHATS_ROUTE
-
-
-        val sizeAwareDrawerState = rememberSizeAwareDrawerState(widthSizeClass == WindowWidthSizeClass.Expanded)
-
-        val coroutineScope = rememberCoroutineScope()
-
-        val chatListState = rememberLazyListState()
 
         ModalNavigationDrawer(
             drawerState = sizeAwareDrawerState,
             drawerContent = {
                 ModalDrawerSheet(drawerContainerColor = MaterialTheme.colorScheme.background) {
                     AppDrawer(
-                        currentRoute = currentRoute,
                         onChatClicked = {
-                            coroutineScope.launch {
-                                viewModel.setEvent(HomeEvent.OnChatClicked(it))
-                                sizeAwareDrawerState.close()
-                            }
+                            appState.coroutineScope.launch { sizeAwareDrawerState.close() }
+                            viewModel.setEvent(MainEvent.OnChatClicked(it))
                         },
                         onNewChatClicked = {
-                            coroutineScope.launch {
-                                viewModel.setEvent(HomeEvent.OnNewChatClicked)
-                                sizeAwareDrawerState.close()
-                            }
+                            appState.coroutineScope.launch { sizeAwareDrawerState.close() }
+                            viewModel.setEvent(MainEvent.OnNewChatClicked)
                         },
-                        closeDrawer = { coroutineScope.launch { sizeAwareDrawerState.close() } },
-                        navigateToHome = navigationActions.navigateToHome,
-                        onIconClicked = { darkTheme.value = !darkTheme.value },
-                        selectedConversation = uiState.selectedConversation,
+                        onNewTranscriptionClicked = {
+                            appState.coroutineScope.launch { sizeAwareDrawerState.close() }
+                            appState.navController.navigateToTranscription()
+                        },
+                        closeDrawer = { appState.coroutineScope.launch { sizeAwareDrawerState.close() } },
+                        onDayNightClicked = { darkTheme.value = !darkTheme.value },
                         conversations = uiState.conversations
                     )
                 }
             },
             content = {
-                CGPTNavGraph(
-                    navController = navController,
-                    openDrawer = { coroutineScope.launch { sizeAwareDrawerState.open() } },
-                    onDeleteChat = {
-                        viewModel.setEvent(HomeEvent.OnDeleteChatClicked(uiState.selectedConversation))
-                    },
-                    chatListState = chatListState
+                MainNavHost(
+                    navController = appState.navController,
+                    openDrawer = { appState.coroutineScope.launch { sizeAwareDrawerState.open() } },
+                    onDeleteChat = { viewModel.setEvent(MainEvent.OnDeleteChatClicked(it)) },
+                    onNewChatCreated = {
+                        viewModel.setEvent(MainEvent.OnNewChatCreated(it))
+                    }
                 )
             }
         )
+
     }
 }
 

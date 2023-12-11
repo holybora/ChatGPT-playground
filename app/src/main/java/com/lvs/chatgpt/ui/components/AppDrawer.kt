@@ -1,4 +1,4 @@
-    package com.lvs.chatgpt.ui.components
+package com.lvs.chatgpt.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -20,6 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.outlined.AddComment
+import androidx.compose.material.icons.outlined.FaceRetouchingNatural
+import androidx.compose.material.icons.outlined.Microwave
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,45 +41,62 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.rememberAsyncImagePainter
 import com.lvs.chatgpt.constant.urlToImageAppIcon
-import com.lvs.chatgpt.ui.CGPTDestinations.CHATS_ROUTE
 import com.lvs.chatgpt.ui.theme.ChatGPTTheme
 import com.lvs.data.remote.db.entities.ConversationEntity
 
 @Composable
 fun AppDrawer(
-    currentRoute: String,
-    selectedConversation: ConversationEntity?,
     conversations: List<ConversationEntity>,
     onChatClicked: (ConversationEntity?) -> Unit,
-    navigateToHome: () -> Unit,
     closeDrawer: () -> Unit,
     onNewChatClicked: () -> Unit,
-    onIconClicked: () -> Unit = {}
+    onDayNightClicked: () -> Unit = {},
+    onNewAssistantClicked: () -> Unit = {},
+    onNewTranscriptionClicked: () -> Unit = {}
 ) {
 
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
-        DrawerHeader(clickAction = onIconClicked)
+        DrawerHeader(onDayNightClicked = onDayNightClicked)
         DividerItem()
+        DrawerItemHeader("Assistants")
+        NavigationDrawerItem(
+            label = { Text(text = "New Assistant") },
+            selected = false,
+            onClick = { onNewAssistantClicked(); closeDrawer() },
+            icon = { Icon(Icons.Outlined.FaceRetouchingNatural, null) },
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+        )
         DrawerItemHeader("Chats")
         NavigationDrawerItem(
             label = { Text(text = "New Chat") },
             selected = false,
-            onClick = { onNewChatClicked(); navigateToHome(); closeDrawer() },
+            onClick = { onNewChatClicked(); closeDrawer() },
             icon = { Icon(Icons.Outlined.AddComment, null) },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         HistoryConversations(
-            onChatClicked = onChatClicked, conversations = conversations, selectedConversation = selectedConversation
+            onChatClicked = onChatClicked, conversations = conversations
         )
+
+        DrawerItemHeader("Speech to text")
+        NavigationDrawerItem(
+            label = { Text(text = "Generate transcription") },
+            selected = false,
+            onClick = { onNewTranscriptionClicked(); closeDrawer() },
+            icon = { Icon(Icons.Outlined.Microwave, null) },
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+        )
+
+
     }
 }
 
 @Composable
 private fun DrawerHeader(
-    clickAction: () -> Unit = {}
+    onDayNightClicked: () -> Unit = {}
 ) {
     ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
 
@@ -122,7 +141,7 @@ private fun DrawerHeader(
         )
 
         IconButton(
-            onClick = { clickAction.invoke() },
+            onClick = { onDayNightClicked.invoke() },
             content = {
                 Icon(
                     Icons.Filled.WbSunny,
@@ -143,8 +162,7 @@ private fun DrawerHeader(
 @Composable
 private fun ColumnScope.HistoryConversations(
     onChatClicked: (ConversationEntity?) -> Unit,
-    conversations: List<ConversationEntity>,
-    selectedConversation: ConversationEntity?
+    conversations: List<ConversationEntity>
 ) {
     LazyColumn(
         Modifier
@@ -154,9 +172,7 @@ private fun ColumnScope.HistoryConversations(
         items(conversations.size) { index ->
             NavigationDrawerItem(
                 label = { Text(text = conversations[index].title) },
-                selected = selectedConversation
-                    ?.run { conversations[index].id == id }
-                    ?: false,
+                selected = false,
                 onClick = { onChatClicked(conversations[index]) },
                 icon = { Icon(Icons.Filled.Message, null) },
                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -191,13 +207,10 @@ fun DividerItem(modifier: Modifier = Modifier) {
 fun PreviewAppDrawer() {
     ChatGPTTheme {
         AppDrawer(
-            currentRoute = CHATS_ROUTE,
             onChatClicked = { },
             onNewChatClicked = { },
-            onIconClicked = { },
+            onDayNightClicked = { },
             closeDrawer = { },
-            selectedConversation = ConversationEntity(0, "New Chat", ""),
-            navigateToHome = { },
             conversations = listOf(
                 ConversationEntity(
                     0, "New Chat", ""

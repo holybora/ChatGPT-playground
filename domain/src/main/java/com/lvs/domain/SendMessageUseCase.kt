@@ -5,9 +5,9 @@ import com.lvs.data.local.main.MessageUiEntity
 import com.lvs.data.remote.api.enities.MessageDto
 import com.lvs.data.remote.common.GPTModel
 import com.lvs.data.remote.db.entities.MessageEntity
-import com.lvs.data.remote.repositories.ConversationRepository
-import com.lvs.data.remote.repositories.MessageRepository
-import com.lvs.data.remote.repositories.OpenAIRepository
+import com.lvs.data.repositories.ConversationRepository
+import com.lvs.data.repositories.MessageRepository
+import com.lvs.data.repositories.OpenAIRepository
 import javax.inject.Inject
 
 class SendMessageToChatGPTUseCase @Inject constructor(
@@ -29,7 +29,7 @@ class SendMessageToChatGPTUseCase @Inject constructor(
         //TODO: replace on converters
         val response =
             openAIRepository.textCompletionsWithStream(
-                model = GPTModel.GPT35TURBO,
+                model = GPTModel.GPT4_1106_PREVIEW,
                 messages = params.messagesForContext
                     .asReversed()
                     .toMutableList()

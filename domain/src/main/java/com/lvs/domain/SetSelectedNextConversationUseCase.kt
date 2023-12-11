@@ -1,6 +1,6 @@
 package com.lvs.domain
 
-import com.lvs.data.remote.repositories.ConversationRepository
+import com.lvs.data.repositories.ConversationRepository
 import javax.inject.Inject
 
 class SetSelectedNextConversationUseCase @Inject constructor(val conversationRepository: ConversationRepository) {

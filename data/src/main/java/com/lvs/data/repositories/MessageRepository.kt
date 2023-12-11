@@ -1,4 +1,4 @@
-package com.lvs.data.remote.repositories
+package com.lvs.data.repositories
 
 import com.lvs.data.remote.db.entities.MessageEntity
 import kotlinx.coroutines.flow.Flow

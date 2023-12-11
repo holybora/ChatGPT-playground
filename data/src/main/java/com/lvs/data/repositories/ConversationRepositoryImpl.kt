@@ -1,12 +1,7 @@
-package com.lvs.data.remote.repositories
+package com.lvs.data.repositories
 
-import android.util.Log
 import com.lvs.data.remote.db.dao.ConversationsDao
 import com.lvs.data.remote.db.entities.ConversationEntity
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class ConversationRepositoryImpl @Inject constructor(
@@ -14,14 +9,6 @@ class ConversationRepositoryImpl @Inject constructor(
 ) : ConversationRepository {
 
     private val TAG = ConversationRepositoryImpl::class.java.name
-
-    private val selectedConversation: MutableStateFlow<ConversationEntity?> = MutableStateFlow(null)
-    override fun setSelectedConversation(conversationEntity: ConversationEntity?) {
-        selectedConversation.update { conversationEntity }
-    }
-
-    override fun getSelectedConversation(): Flow<ConversationEntity?> = selectedConversation
-        .onEach { Log.d(TAG, "selected conversation: ${it?.id} ${it?.title}") }
 
     override fun getConversationsFlow() = conversationsDao.getAllDesc()
     override fun getConversations(): List<ConversationEntity> = conversationsDao.getAll()

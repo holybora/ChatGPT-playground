@@ -1,17 +1,15 @@
 package com.lvs.chatgpt.di
 
 import com.lvs.data.converters.MessagesDataToUiConverter
-import com.lvs.data.remote.repositories.ConversationRepository
-import com.lvs.data.remote.repositories.MessageRepository
-import com.lvs.data.remote.repositories.OpenAIRepository
+import com.lvs.data.repositories.ConversationRepository
+import com.lvs.data.repositories.MessageRepository
+import com.lvs.data.repositories.OpenAIRepository
 import com.lvs.domain.CreateConversationUseCase
 import com.lvs.domain.DeleteConversationUseCase
 import com.lvs.domain.GetConversationsFlowUseCase
 import com.lvs.domain.GetMessagesByConversationIdUseCase
-import com.lvs.domain.GetSelectedConversationFlowUseCase
 import com.lvs.domain.InsertMessageUseCase
 import com.lvs.domain.SendMessageToChatGPTUseCase
-import com.lvs.domain.SetSelectedConversationUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -58,16 +56,6 @@ object DomainModule {
         messagesRepository = messagesRepository,
         messagesDataToUiConverter = messagesDataToUiConverter
     )
-
-    @Provides
-    fun provideGetSelectedConversationFlowUseCase(
-        conversationRepository: ConversationRepository
-    ) = GetSelectedConversationFlowUseCase(conversationRepository)
-
-    @Provides
-    fun provideSetSelectedConversationUseCase(
-        conversationRepository: ConversationRepository
-    ) = SetSelectedConversationUseCase(conversationRepository)
 
     @Provides
     fun provideDeleteConversationUseCase(

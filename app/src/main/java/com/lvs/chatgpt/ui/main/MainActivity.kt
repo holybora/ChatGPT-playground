@@ -1,4 +1,4 @@
-package com.lvs.chatgpt.ui
+package com.lvs.chatgpt.ui.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -17,8 +17,7 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            val widthSizeClass = calculateWindowSizeClass(this).widthSizeClass
-            CGPTApp(widthSizeClass = widthSizeClass)
+            ChatGPTApp(windowSizeClass = calculateWindowSizeClass(this@MainActivity))
         }
     }
 }
