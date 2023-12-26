@@ -98,6 +98,7 @@ dependencies {
 
     debugImplementation libs.androidx.ui.tooling
     implementation libs.androidx.ui.tooling.preview.android
+    implementation libs.accompanist.permissions
 
     ksp libs.room.compiler
 

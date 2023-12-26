@@ -1,5 +1,6 @@
 package com.lvs.chatgpt.ui.stt
 
+import android.Manifest
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -23,9 +24,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.lvs.chatgpt.ui.components.AppBar
 import com.lvs.chatgpt.ui.components.NiaButton
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun TranscriptionScreen(
     viewModel: TranscriptionViewModel = hiltViewModel(),
@@ -33,6 +37,12 @@ fun TranscriptionScreen(
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val permissionState = rememberMultiplePermissionsState(
+        listOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        )
+    )
 
     val result = remember { mutableStateOf<Uri?>(null) }
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) {
@@ -63,7 +73,13 @@ fun TranscriptionScreen(
 
         Box(modifier = Modifier.fillMaxSize()) {
             NiaButton(
-                onClick = { viewModel.setEvent(TranscriptionEvent.OnUploadClicked) },
+                onClick = {
+                    if (permissionState.allPermissionsGranted) {
+                        viewModel.setEvent(TranscriptionEvent.OnUploadClicked)
+                    } else {
+                        permissionState.launchMultiplePermissionRequest()
+                    }
+                },
                 text = { Text("Upload file") },
                 leadingIcon = { Icon(imageVector = Icons.Outlined.Add, contentDescription = null) },
                 modifier = Modifier.align(Alignment.Center)

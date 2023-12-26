@@ -7,6 +7,7 @@ import com.lvs.data.repositories.MessageRepository
 import com.lvs.data.repositories.OpenAIRepository
 import com.lvs.domain.CreateConversationUseCase
 import com.lvs.domain.DeleteConversationUseCase
+import com.lvs.domain.GetAudioFromVideoUseCase
 import com.lvs.domain.GetConversationsFlowUseCase
 import com.lvs.domain.GetFilePathFromUriUseCase
 import com.lvs.domain.GetMessagesByConversationIdUseCase
@@ -68,5 +69,8 @@ object DomainModule {
     @Provides
     fun provideGetFilePathFromUriUseCase(@ApplicationContext context: Context) =
         GetFilePathFromUriUseCase(context)
+
+    @Provides
+    fun provideGetAudioFromVideoUseCase() = GetAudioFromVideoUseCase()
 
 }
