@@ -11,6 +11,7 @@ import com.lvs.domain.GetAudioFromVideoUseCase
 import com.lvs.domain.GetConversationsFlowUseCase
 import com.lvs.domain.GetFilePathFromUriUseCase
 import com.lvs.domain.GetMessagesByConversationIdUseCase
+import com.lvs.domain.GetTextFromAudioFileUseCase
 import com.lvs.domain.InsertMessageUseCase
 import com.lvs.domain.SendMessageToChatGPTUseCase
 import dagger.Module
@@ -71,6 +72,10 @@ object DomainModule {
         GetFilePathFromUriUseCase(context)
 
     @Provides
-    fun provideGetAudioFromVideoUseCase() = GetAudioFromVideoUseCase()
+    fun provideGetAudioFromVideoUseCase(@ApplicationContext context: Context) = GetAudioFromVideoUseCase(context)
+
+    @Provides
+    fun provideGetTextFromAudioFileUseCase(openAIRepository: OpenAIRepository) =
+        GetTextFromAudioFileUseCase(openAIRepository)
 
 }

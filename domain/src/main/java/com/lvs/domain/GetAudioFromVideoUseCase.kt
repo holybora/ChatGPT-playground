@@ -13,7 +13,7 @@ class GetAudioFromVideoUseCase(context: Context) {
     private val cacheDir = context.cacheDir
 
     @Throws(IOException::class)
-    operator fun invoke(inputVideoUri: Uri) {
+    operator fun invoke(inputVideoUri: Uri): String {
 
         val fileOutput = File(cacheDir.path + "/audio_from_video.mp3")
         //clean up temp file
@@ -29,6 +29,8 @@ class GetAudioFromVideoUseCase(context: Context) {
             true,
             false
         )
+
+        return fileOutput.path
     }
 }
 

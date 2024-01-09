@@ -15,7 +15,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.text.DateFormat
 import java.time.Duration
-import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -47,10 +46,10 @@ object NetworkModule {
                 chain.proceed(requestBuilder.build())
             })
         .addNetworkInterceptor(logger)
-        .callTimeout(Duration.ZERO)
-        .connectTimeout(Duration.ZERO)
-        .readTimeout(Duration.ZERO)
-        .writeTimeout(Duration.ZERO)
+        .callTimeout(Duration.ofMinutes(2))
+        .connectTimeout(Duration.ofMinutes(2))
+        .readTimeout(Duration.ofMinutes(2))
+        .writeTimeout(Duration.ofMinutes(2))
         .build()
 
     @Singleton
@@ -75,7 +74,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideLoggingInterceptor() : HttpLoggingInterceptor = HttpLoggingInterceptor().also {
-        it.setLevel(HttpLoggingInterceptor.Level.BODY)
+    fun provideLoggingInterceptor(): HttpLoggingInterceptor = HttpLoggingInterceptor().also {
+        it.setLevel(HttpLoggingInterceptor.Level.HEADERS)
     }
 }
