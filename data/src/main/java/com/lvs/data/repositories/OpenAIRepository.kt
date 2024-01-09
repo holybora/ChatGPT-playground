@@ -7,5 +7,5 @@ import com.lvs.data.remote.common.GPTModel
 
 interface OpenAIRepository {
     suspend fun textCompletionsWithStream(model: GPTModel, messages: List<MessageDto>): ChatCompletionResponseBody
-    suspend fun speechToText(file: String): SpeechToTextResponseBody
+    suspend fun speechToText(filePath: String): SpeechToTextResponseBody
 }
