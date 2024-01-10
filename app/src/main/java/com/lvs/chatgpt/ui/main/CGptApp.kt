@@ -1,6 +1,5 @@
 package com.lvs.chatgpt.ui.main
 
-import android.util.Log
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,16 +45,6 @@ fun ChatGPTApp(
         val sizeAwareDrawerState =
             rememberSizeAwareDrawerState(appState.windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded)
 
-        LaunchedEffect(key1 = uiState.openConversation) {
-            Log.d(TAG, "openConversation SideEfeect")
-            val convId = uiState.openConversation?.conversationId
-            val isNew = uiState.openConversation?.isNew ?: false
-            when (convId) {
-                null -> appState.navController.navigateToNewChat()
-                else -> appState.navController.navigateToChat(conversationId = convId, isNew = isNew)
-            }
-        }
-
         ModalNavigationDrawer(
             drawerState = sizeAwareDrawerState,
             drawerContent = {
@@ -71,7 +60,7 @@ fun ChatGPTApp(
                         },
                         onNewTranscriptionClicked = {
                             appState.coroutineScope.launch { sizeAwareDrawerState.close() }
-                            appState.navController.navigateToTranscription()
+                            viewModel.setEvent(MainEvent.OnTranscriptionClicked)
                         },
                         closeDrawer = { appState.coroutineScope.launch { sizeAwareDrawerState.close() } },
                         onDayNightClicked = { darkTheme.value = !darkTheme.value },
@@ -90,6 +79,24 @@ fun ChatGPTApp(
                 )
             }
         )
+
+        LaunchedEffect(key1 = uiState.navigationSideEffect) {
+            when (val effect = uiState.navigationSideEffect) {
+
+                NavigationSideEffect.OpenBlankChatEffect ->
+                    appState.navController.navigateToNewChat()
+
+                is NavigationSideEffect.OpenConversationEffect -> {
+                    appState.navController.navigateToChat(conversationId = effect.conversationId, isNew = effect.isNew)
+                }
+
+                NavigationSideEffect.OpenTranscriptionEffect -> {
+                    appState.navController.navigateToTranscription()
+                }
+
+                null -> {} //do nothing
+            }
+        }
 
     }
 }

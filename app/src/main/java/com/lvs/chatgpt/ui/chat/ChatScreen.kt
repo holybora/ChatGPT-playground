@@ -44,7 +44,7 @@ fun ChatScreen(
         ChatConversation(
             messages = uiState.messages,
             onSendMessageListener = {
-                viewModel.handleEvent(ChatEvent.OnSendMessage(it))
+                viewModel.setEvent(ChatEvent.OnSendMessage(it))
             },
             showLoading = uiState.isFetching,
             listState = chatListState

@@ -51,7 +51,7 @@ abstract class BaseViewModel<Event : UiEvent, State : UiState> : ViewModel() {
     /**
      * Handle each event
      */
-    abstract fun handleEvent(event: Event)
+    protected abstract fun handleEvent(event: Event)
 
     /**
      * Set new Event

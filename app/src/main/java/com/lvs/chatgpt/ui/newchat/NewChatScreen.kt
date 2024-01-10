@@ -44,7 +44,7 @@ fun NewChatScreen(
             messages = emptyList(),
             onSendMessageListener = {
                 focusManager.clearFocus()
-                viewModel.handleEvent(NewChatEvent.OnSendMessage(it))
+                viewModel.setEvent(NewChatEvent.OnSendMessage(it))
             },
             showLoading = false
         )

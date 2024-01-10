@@ -20,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.outlined.AddComment
-import androidx.compose.material.icons.outlined.FaceRetouchingNatural
 import androidx.compose.material.icons.outlined.Microwave
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -51,7 +50,6 @@ fun AppDrawer(
     closeDrawer: () -> Unit,
     onNewChatClicked: () -> Unit,
     onDayNightClicked: () -> Unit = {},
-    onNewAssistantClicked: () -> Unit = {},
     onNewTranscriptionClicked: () -> Unit = {}
 ) {
 
@@ -61,14 +59,6 @@ fun AppDrawer(
         Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
         DrawerHeader(onDayNightClicked = onDayNightClicked)
         DividerItem()
-        DrawerItemHeader("Assistants")
-        NavigationDrawerItem(
-            label = { Text(text = "New Assistant") },
-            selected = false,
-            onClick = { onNewAssistantClicked(); closeDrawer() },
-            icon = { Icon(Icons.Outlined.FaceRetouchingNatural, null) },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-        )
         DrawerItemHeader("Chats")
         NavigationDrawerItem(
             label = { Text(text = "New Chat") },

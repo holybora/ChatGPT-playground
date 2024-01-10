@@ -28,7 +28,9 @@ class HomeViewModel @Inject constructor(
                             isFirstRun = false
                             copy(
                                 conversations = it,
-                                openConversation = if (it.isNotEmpty()) OpenConversationSideEffect(it.first().id) else null
+                                navigationSideEffect =
+                                if (it.isNotEmpty()) NavigationSideEffect.OpenConversationEffect(it.first().id)
+                                else NavigationSideEffect.OpenBlankChatEffect
                             )
                         } else
                             copy(conversations = it)
@@ -40,16 +42,26 @@ class HomeViewModel @Inject constructor(
     override val tag: String
         get() = HomeViewModel::class.java.name
 
-    override fun createInitialState(): MainUiState = MainUiState()
+    override fun createInitialState(): MainUiState =
+        MainUiState(navigationSideEffect = null)
 
     override fun handleEvent(event: MainEvent) {
         when (event) {
             is MainEvent.OnChatClicked -> {
-                setState { copy(openConversation = OpenConversationSideEffect(conversationId = checkNotNull(event.conversation?.id))) }
+                Log.d(tag, "onChatClicked event: ${event.conversation?.id}")
+                setState {
+                    copy(
+                        navigationSideEffect = NavigationSideEffect.OpenConversationEffect(
+                            conversationId = checkNotNull(
+                                event.conversation?.id
+                            )
+                        )
+                    )
+                }
             }
 
             is MainEvent.OnNewChatClicked -> {
-                setState { copy(openConversation = null) }
+                setState { copy(navigationSideEffect = NavigationSideEffect.OpenBlankChatEffect) }
             }
 
             is MainEvent.OnDeleteChatClicked -> {
@@ -74,14 +86,17 @@ class HomeViewModel @Inject constructor(
                             //deleted single conv, set to default
                             conversations.isEmpty() || conversations.size == 1 ->
                                 setState {
-                                    copy(conversations = emptyList(), openConversation = null)
+                                    copy(
+                                        conversations = emptyList(),
+                                        navigationSideEffect = NavigationSideEffect.OpenBlankChatEffect
+                                    )
                                 }
 
                             //deleted last, fetch previous
                             conversations.lastIndex == index ->
                                 setState {
                                     copy(
-                                        openConversation = OpenConversationSideEffect(
+                                        navigationSideEffect = NavigationSideEffect.OpenConversationEffect(
                                             conversations[conversations.lastIndex - 1].id
                                         )
                                     )
@@ -90,7 +105,7 @@ class HomeViewModel @Inject constructor(
                             //fetch next in turn
                             else -> setState {
                                 copy(
-                                    openConversation = OpenConversationSideEffect(
+                                    navigationSideEffect = NavigationSideEffect.OpenConversationEffect(
                                         conversations[index + 1].id
                                     )
                                 )
@@ -103,13 +118,20 @@ class HomeViewModel @Inject constructor(
 
             is MainEvent.OnNewChatCreated -> setState {
                 copy(
-                    openConversation = OpenConversationSideEffect(
+                    navigationSideEffect = NavigationSideEffect.OpenConversationEffect(
                         conversationId = event.convId,
                         isNew = true
                     )
                 )
             }
 
+            MainEvent.DisposeSideEffect -> {
+                setState { copy(navigationSideEffect = null) }
+            }
+
+            MainEvent.OnTranscriptionClicked -> {
+                setState { copy(navigationSideEffect = NavigationSideEffect.OpenTranscriptionEffect) }
+            }
         }
 
     }
@@ -118,15 +140,24 @@ class HomeViewModel @Inject constructor(
 
 data class MainUiState(
     val conversations: List<ConversationEntity> = emptyList(),
-    val openConversation: OpenConversationSideEffect? = null
+    val navigationSideEffect: NavigationSideEffect?
 ) : UiState
 
-data class OpenConversationSideEffect(val conversationId: Long, val isNew: Boolean = false)
+
+sealed interface NavigationSideEffect {
+    class OpenConversationEffect(val conversationId: Long, val isNew: Boolean = false) : NavigationSideEffect
+    object OpenBlankChatEffect : NavigationSideEffect
+    object OpenTranscriptionEffect : NavigationSideEffect
+}
+
 
 sealed interface MainEvent : UiEvent {
     class OnChatClicked(val conversation: ConversationEntity?) : MainEvent
     object OnNewChatClicked : MainEvent
     class OnNewChatCreated(val convId: Long) : MainEvent
     class OnDeleteChatClicked(val conversation: ConversationEntity?) : MainEvent
+
+    object DisposeSideEffect : MainEvent
+    object OnTranscriptionClicked : MainEvent
 
 }
